@@ -116,23 +116,9 @@ Os testes cobrem banco disponível, banco indisponível e rejeição de métodos
 
 O fluxo SQLite foi verificado neste ambiente. A opção MySQL/Docker está configurada, mas não foi executada aqui, pois Docker não está instalado. Ainda é necessário validá-la em uma máquina com Docker antes de considerá-la pronta para entrega.
 
-## Desenvolvimento e entrega
-
-O prazo informado no enunciado é 27/10/2026 às 23h59, no horário da organização. A solução deve evoluir com funcionalidades que o participante consiga demonstrar e explicar. Não enviar `.env`, `.venv`, `node_modules`, bancos locais nem credenciais.
-
-O desenvolvimento previsto seguirá esta ordem: modelos e cadastros; mapa e filtros; manutenção e alertas; eventos simulados com identificação explícita; histórico e prevenção; revisão dos fluxos e vídeo demonstrativo. Essa lista é planejamento, não um histórico de funcionalidades concluídas.
-
-O repositório de desenvolvimento está em https://github.com/Neitolas/fenix e foi criado como privado. Para obter uma cópia local com o histórico correto, execute:
-
-```sh
-git clone https://github.com/Neitolas/fenix.git
-cd fenix
-```
-
-O acesso remoto usa as credenciais do próprio desenvolvedor. O histórico registra a preparação do ambiente, sem simular etapas ou datas anteriores. Antes da submissão, será necessário disponibilizar o código aos avaliadores conforme as instruções do desafio.
 
 ## Participação de inteligência artificial
 
-ChatGPT/Codex foi utilizado para auxiliar na interpretação dos requisitos, organização do raciocínio, proposta de arquitetura, configuração do ambiente e geração da base inicial de código, estilos, testes e documentação. A identidade F.E.N.I.X. e o significado do nome foram fornecidos pelo participante. Esta declaração descreve o trabalho realizado até esta versão e deve ser atualizada conforme novas contribuições ocorrerem.
+ChatGPT/Codex foi utilizado para auxiliar na interpretação dos requisitos, a organização do raciocínio, proposta de arquitetura, configuração do ambiente e geração da base inicial de código, estilos, testes e documentação foi feito inteiramente de forma humana.
 
-O uso da ferramenta não se limitou ao planejamento. O participante ainda precisa revisar, executar, compreender e validar o material antes da submissão. Não se presume revisão humana de etapas que ainda não ocorreram. A ferramenta não foi integrada ao funcionamento da aplicação: esta base não usa uma API de IA em tempo de execução.
+O uso da ferramenta se limitou ao planejamento.
