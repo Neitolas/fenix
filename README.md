@@ -127,6 +127,4 @@ A proposta dos módulos e da integração com o serviço PHP está em [Especific
 
 ## Participação de inteligência artificial
 
-ChatGPT/Codex foi utilizado para auxiliar na interpretação dos requisitos, a organização do raciocínio, proposta de arquitetura, configuração do ambiente e geração da base inicial de código, estilos, testes e documentação foi feito inteiramente de forma humana.
-
-O uso da ferramenta se limitou ao planejamento.
+ChatGPT/Codex auxiliou na interpretação dos requisitos, no planejamento, na configuração do ambiente e na geração da base inicial de código, estilos, testes e documentação. O nome F.E.N.I.X. e seu significado foram propostos pelo participante. A declaração será atualizada conforme o projeto evoluir. A aplicação não utiliza uma API de IA em tempo de execução.
