@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Equipment, Agent, Event
+
+from .models import Agent, Equipment, Event
 
 
 @admin.register(Equipment)

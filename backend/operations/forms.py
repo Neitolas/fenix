@@ -1,6 +1,8 @@
 import re
+
 from django import forms
-from .models import Equipment, Agent
+
+from .models import Agent, Equipment
 
 
 class EquipmentForm(forms.ModelForm):

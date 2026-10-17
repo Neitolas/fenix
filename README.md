@@ -126,6 +126,14 @@ Disponibilidade = operacionais ÷ (operacionais + indisponíveis). Não instalad
 
 ## Testar
 
+Para instalar as ferramentas de desenvolvimento, além das dependências da aplicação:
+
+```sh
+python -m pip install -r backend/requirements-dev.txt
+ruff check backend scripts
+ruff format --check backend scripts
+```
+
 ```sh
 python backend/manage.py check
 python backend/manage.py makemigrations --check --dry-run
@@ -138,6 +146,7 @@ No diretório `frontend/`:
 ```sh
 npm test
 npm run lint
+npm run format:check
 npm run build
 ```
 
@@ -150,6 +159,35 @@ Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusi
 Validar o caminho Docker/MySQL em instalação limpa, conferir o mapa e os formulários em navegadores reais, revisar segurança de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. A visualização estática não equivale à hospedagem dos três serviços integrados.
 
 O prazo do enunciado é 27/10/2026 às 23h59. O repositório está privado durante o desenvolvimento; o material deverá ficar acessível aos avaliadores antes da submissão. O limite de envio informado é 50 MB.
+
+## Organização e qualidade do código
+
+A refatoração mantém os fluxos de inventário, operação e prevenção e reduz as responsabilidades concentradas nos arquivos de entrada. Os princípios foram aplicados onde há uma necessidade concreta; não foram acrescentadas hierarquias de classes apenas para representar todas as letras de SOLID.
+
+| Prática | Aplicação no projeto |
+| --- | --- |
+| Responsabilidade única (SRP) | `ResourceFilters` apresenta filtros; `ResourceTable` apresenta registros; `useCityConnection` coordena sessão, sincronização e dados da central. No Django, `event_data.py` valida entradas, `event_service.py` executa a ingestão e `telemetry.py` traduz resultados para HTTP. |
+| Dependências explícitas | O hook recebe um cliente compatível com o contrato `CityClient`, limitado a sessão, leitura da cidade e saída. Os testes podem fornecer esse cliente sem acessar a rede. A validação de eventos recebe um relógio explícito quando necessário. |
+| DRY | Equipamentos e agentes compartilham a fábrica de views CRUD. Filtros e tabelas têm componentes reutilizáveis. Tipos de transição e colunas do CSV possuem uma definição central em seus respectivos módulos. |
+| KISS e coesão | Funções pequenas por tarefa, composição de componentes e serviços simples; sem camadas de repositório que apenas repassem chamadas ao ORM. |
+| Validação antecipada | Identificadores, datas, coordenadas e contrato CSV são verificados antes da persistência ou geração do arquivo. Erros de contrato recebem HTTP 400; falhas internas do serviço PHP recebem HTTP 500 sem detalhes internos. |
+| Comandos e consultas separados | A consulta do histórico fica separada da ingestão transacional. Isto organiza o código sem introduzir infraestrutura de CQRS. |
+| Segurança de recursos e concorrência | O PHP fecha o fluxo temporário em `finally`. A sincronização React aguarda leituras em andamento antes de iniciar outro ciclo automático, ignora respostas antigas e resultados após desmontagem ou retorno à demonstração, preservando a última leitura quando a rede falha. |
+| Estilo verificável | EditorConfig define convenções de edição; Ruff organiza imports, verifica e formata Python; Prettier verifica TypeScript/CSS; Oxlint verifica a interface. O PHP foi organizado com tipos estritos e convenções de apresentação da PSR-12. |
+
+CRUD significa **Create, Read, Update e Delete**: no projeto, corresponde a cadastrar, consultar, editar e excluir logicamente os recursos. É o conjunto de operações do inventário, não um princípio de clean code. Transações, autenticação, CSRF, idempotência e histórico continuam protegendo essas operações.
+
+Arquivos extraídos nesta etapa:
+
+- `frontend/src/hooks/useCityConnection.ts`: cliente tipado, persistência local e sincronização.
+- `frontend/src/components/ResourceFilters.tsx` e `ResourceTable.tsx`: apresentação reutilizável.
+- `backend/operations/event_data.py`: contrato tipado e validação dos eventos.
+- `backend/operations/event_service.py`: transação, deduplicação e atualização independente de estado, posição e manutenção.
+- `pyproject.toml`, `.editorconfig` e `backend/requirements-dev.txt`: convenções e ferramentas de desenvolvimento.
+
+Validação desta etapa: 21 testes Django, 7 testes de domínio e 8 de interface passaram. Ruff, Prettier, Oxlint e build TypeScript/Vite também passaram. As oito verificações PHP e o teste HTTP Django → PHP → CSV foram executados com PHP.wasm; respostas 400 de contrato inválido e 401 de autenticação também foram verificadas. A execução nativa com PHP 8.3 permanece no CI. Docker/MySQL e conferência visual em navegador real continuam entre as validações pendentes.
+
+Referências oficiais: [princípios arquitetônicos e SOLID](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles), [hooks personalizados do React](https://react.dev/learn/reusing-logic-with-custom-hooks), [Ruff](https://docs.astral.sh/ruff/formatter/) e [PSR-12](https://www.php-fig.org/psr/psr-12/).
 
 ## Participação de inteligência artificial
 

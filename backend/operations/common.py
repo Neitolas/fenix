@@ -1,5 +1,6 @@
 import json
 from functools import wraps
+
 from django.http import JsonResponse
 
 
@@ -42,17 +43,24 @@ def filtered(queryset, params):
     if params.get("kind") and "kind" in names:
         queryset = queryset.filter(kind=params["kind"])
     if params.get("search"):
-        fields = [field for field in [
-            "serial",
-            "name",
-            "registration",
-            "neighborhood",
-            "agency",
-            "brand",
-            "model",
-        ] if field in names]
+        fields = [
+            field
+            for field in [
+                "serial",
+                "name",
+                "registration",
+                "neighborhood",
+                "agency",
+                "brand",
+                "model",
+            ]
+            if field in names
+        ]
         needle = params["search"].lower()
-        ids = [row["id"] for row in queryset.values("id", *fields).iterator()
-               if any(needle in str(row[field]).lower() for field in fields)]
+        ids = [
+            row["id"]
+            for row in queryset.values("id", *fields).iterator()
+            if any(needle in str(row[field]).lower() for field in fields)
+        ]
         queryset = queryset.filter(pk__in=ids)
     return queryset.order_by("id")

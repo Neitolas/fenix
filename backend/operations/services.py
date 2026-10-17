@@ -1,10 +1,12 @@
 from datetime import timedelta
-from django.utils import timezone
+
 from django.db.models import Count, Q
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.http import require_GET
-from .models import Equipment, Agent
+
 from .common import authenticated, filtered, serialize
+from .models import Agent, Equipment
 
 
 def attention(item, now=None):
@@ -37,7 +39,11 @@ def attention(item, now=None):
     level = (
         "critical"
         if score >= 75
-        else "high" if score >= 50 else "moderate" if score >= 25 else "low"
+        else "high"
+        if score >= 50
+        else "moderate"
+        if score >= 25
+        else "low"
     )
     return {
         "id": item.id,

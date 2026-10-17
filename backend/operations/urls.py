@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views, services, telemetry, reports
+
+from . import reports, services, telemetry, views
 
 urlpatterns = [
     path("reports/equipment.csv", reports.equipment_csv),

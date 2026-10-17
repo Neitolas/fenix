@@ -1,7 +1,9 @@
 from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from operations.models import Equipment, Agent, Event
+
+from operations.models import Agent, Equipment, Event
 
 
 class Command(BaseCommand):
@@ -13,11 +15,11 @@ class Command(BaseCommand):
         for i in range(12):
             neighborhood = ["Centro", "Fragata", "Palmital"][i % 3]
             item, _ = Equipment.objects.get_or_create(
-                serial=f"DEMO-{i+1:03}",
+                serial=f"DEMO-{i + 1:03}",
                 defaults=dict(
                     kind=["camera", "radar", "patrol", "terminal"][i % 4],
                     brand="Demonstração",
-                    model=f"Modelo {i+1}",
+                    model=f"Modelo {i + 1}",
                     agency=["Trânsito", "Guarda Municipal"][i % 2],
                     postal_code="17500000",
                     neighborhood=neighborhood,
@@ -39,7 +41,9 @@ class Command(BaseCommand):
                     maintenance=(
                         "immediate"
                         if i % 6 == 2
-                        else "scheduled" if i % 3 == 0 else "none"
+                        else "scheduled"
+                        if i % 3 == 0
+                        else "none"
                     ),
                     next_maintenance=(
                         today + timedelta(days=i - 4) if i % 3 == 0 else None
@@ -47,7 +51,9 @@ class Command(BaseCommand):
                     characteristics=(
                         {"speed_limit": 60}
                         if i % 4 == 1
-                        else {"night_vision": True} if i % 4 == 0 else {}
+                        else {"night_vision": True}
+                        if i % 4 == 0
+                        else {}
                     ),
                 ),
             )
@@ -65,10 +71,10 @@ class Command(BaseCommand):
                     )
         for i in range(6):
             Agent.objects.get_or_create(
-                registration=f"DEMO-A{i+1}",
+                registration=f"DEMO-A{i + 1}",
                 agency="Trânsito",
                 defaults=dict(
-                    name=f"Agente demonstrativo {i+1}",
+                    name=f"Agente demonstrativo {i + 1}",
                     role="Agente de trânsito",
                     status=["active", "available", "incident", "off_duty"][i % 4],
                     neighborhood=["Centro", "Fragata", "Palmital"][i % 3],

@@ -1,7 +1,8 @@
 import json
 from datetime import timedelta
+
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, SimpleTestCase, TestCase
 from django.utils import timezone
 
 
@@ -132,17 +133,27 @@ class OperationsTests(ApiCase):
         item = self.create()
         now = timezone.now()
         base = {"resource": "equipment", "resource_id": item["id"]}
+
         def send(name, kind, minutes, **values):
-            response = self.post("/api/events/", base | {
-                "external_id": name, "kind": kind,
-                "timestamp": (now - timedelta(minutes=minutes)).isoformat(),
-            } | values)
+            response = self.post(
+                "/api/events/",
+                base
+                | {
+                    "external_id": name,
+                    "kind": kind,
+                    "timestamp": (now - timedelta(minutes=minutes)).isoformat(),
+                }
+                | values,
+            )
             self.assertEqual(response.status_code, 201)
             return response.json()
+
         send("beat", "heartbeat", 0)
         send("failure", "failure", 1)
         send("older-recovery", "recovery", 2)
-        self.assertEqual(self.client.get(f"/api/equipment/{item['id']}/").json()["status"], "fault")
+        self.assertEqual(
+            self.client.get(f"/api/equipment/{item['id']}/").json()["status"], "fault"
+        )
         first = send("position1", "position", 1, latitude=-22, longitude=-49)
         send("position2", "position", 0, latitude=-23, longitude=-50)
         send("old-position", "position", 2, latitude=-24, longitude=-51)
@@ -150,7 +161,9 @@ class OperationsTests(ApiCase):
         current = self.client.get(f"/api/equipment/{item['id']}/").json()
         self.assertEqual(current["latitude"], -23)
         history = self.client.get("/api/events/").json()["results"]
-        self.assertEqual(next(e for e in history if e["external_id"] == "failure")["status"], "fault")
+        self.assertEqual(
+            next(e for e in history if e["external_id"] == "failure")["status"], "fault"
+        )
         send("recovery", "recovery", 0)
         send("completion", "maintenance_done", 0.5)
         current = self.client.get(f"/api/equipment/{item['id']}/").json()
@@ -249,13 +262,19 @@ class OperationsTests(ApiCase):
 class ReportTests(ApiCase):
     def test_accented_search_matches_inventory_and_report_payload(self):
         import os
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         self.create()
-        self.assertEqual(self.client.get("/api/equipment/?search=TRÂNSITO").json()["count"], 1)
+        self.assertEqual(
+            self.client.get("/api/equipment/?search=TRÂNSITO").json()["count"], 1
+        )
         service = MagicMock()
         service.__enter__.return_value.headers = {"Content-Type": "text/csv"}
         service.__enter__.return_value.read.return_value = b"csv"
-        with patch.dict(os.environ, {"REPORT_SERVICE_TOKEN": "test-only"}), patch("operations.reports.urlopen", return_value=service) as send:
+        with (
+            patch.dict(os.environ, {"REPORT_SERVICE_TOKEN": "test-only"}),
+            patch("operations.reports.urlopen", return_value=service) as send,
+        ):
             response = self.client.get("/api/reports/equipment.csv?search=TRÂNSITO")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(json.loads(send.call_args.args[0].data)["rows"]), 1)
@@ -270,6 +289,7 @@ class PerformanceTests(ApiCase):
     def test_prevention_does_not_query_each_resource(self):
         from django.db import connection
         from django.test.utils import CaptureQueriesContext
+
         from operations.models import Equipment
 
         for i in range(20):
@@ -278,3 +298,45 @@ class PerformanceTests(ApiCase):
             response = self.client.get("/api/prevention/")
         self.assertEqual(response.status_code, 200)
         self.assertLess(len(queries), 12)
+
+
+class EventValidationTests(SimpleTestCase):
+    def test_invalid_identifiers_and_coordinates_are_rejected_before_ingestion(self):
+        from operations.event_data import parse_event
+
+        base = {
+            "resource": "equipment",
+            "resource_id": 1,
+            "kind": "heartbeat",
+            "external_id": "boundary",
+        }
+        invalid = (
+            [{"resource_id": value} for value in [0, -1, True, 1.5, float("inf"), None]]
+            + [
+                {"kind": "position", "latitude": value, "longitude": -49}
+                for value in [float("nan"), float("inf"), 91, ""]
+            ]
+            + [{"timestamp": 123}, {"kind": []}]
+        )
+        for changes in invalid:
+            with (
+                self.subTest(changes=changes),
+                self.assertRaises((ValueError, TypeError)),
+            ):
+                parse_event(base | changes)
+
+    def test_event_time_validation_uses_an_explicit_clock(self):
+        from operations.event_data import parse_event
+
+        now = timezone.now()
+        event = {
+            "resource": "agent",
+            "resource_id": "1",
+            "kind": "heartbeat",
+            "external_id": "clock",
+        }
+        self.assertEqual(parse_event(event, now=now).timestamp, now)
+        with self.assertRaises(ValueError):
+            parse_event(
+                event | {"timestamp": (now + timedelta(minutes=6)).isoformat()}, now=now
+            )

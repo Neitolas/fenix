@@ -7,8 +7,8 @@ from django.views.decorators.http import require_GET
 def health(request):
     try:
         with connection.cursor() as cursor:
-            cursor.execute('SELECT 1')
+            cursor.execute("SELECT 1")
             cursor.fetchone()
     except DatabaseError:
-        return JsonResponse({'status': 'unavailable'}, status=503)
-    return JsonResponse({'status': 'ok', 'service': 'fenix-api'})
+        return JsonResponse({"status": "unavailable"}, status=503)
+    return JsonResponse({"status": "ok", "service": "fenix-api"})

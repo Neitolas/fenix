@@ -1,8 +1,11 @@
-import json, os
-from urllib.request import Request, urlopen
+import json
+import os
 from urllib.error import URLError
+from urllib.request import Request, urlopen
+
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
+
 from .common import authenticated, filtered
 from .models import Equipment
 

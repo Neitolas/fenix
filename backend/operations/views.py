@@ -1,13 +1,15 @@
 import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError, transaction
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
-from .models import Equipment, Agent
-from .forms import EquipmentForm, AgentForm
-from .common import authenticated, payload, serialize, filtered
+
+from .common import authenticated, filtered, payload, serialize
+from .forms import AgentForm, EquipmentForm
+from .models import Agent, Equipment
 
 
 @require_http_methods(["GET", "POST", "DELETE"])

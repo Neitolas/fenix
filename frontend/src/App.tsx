@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { Category, CityData, Entry, Filters, Risk } from './types'
-import { kinds, statuses, agentStatuses, riskLabels } from './types'
+import { useCallback, useMemo, useState } from 'react'
+import type { Category, Entry, Filters } from './types'
+import { kinds, statuses, riskLabels } from './types'
 import {
-  seed,
   attention,
   filterEntries,
   indicators,
@@ -14,28 +13,17 @@ import {
 import * as api from './api'
 import EntryForm from './components/EntryForm'
 import CityMap from './components/CityMap'
+import ResourceFilters from './components/ResourceFilters'
+import ResourceTable from './components/ResourceTable'
+import { useCityConnection } from './hooks/useCityConnection'
 
 const emptyFilters: Filters = { search: '', kind: '', status: '', region: '', agency: '' }
-const initialData: CityData = { equipment: [], agents: [], events: [] }
-const storageKey = 'fenix-demo-v1'
 const eventLabels: Record<string, string> = {
   failure: 'Falha',
   recovery: 'Recuperação',
   heartbeat: 'Sinal de atividade',
   maintenance_done: 'Manutenção concluída',
   position: 'Posição atualizada',
-}
-function readDemo(): CityData {
-  try {
-    const raw = localStorage.getItem(storageKey)
-    if (raw) {
-      const d = JSON.parse(raw)
-      if (Array.isArray(d.equipment) && Array.isArray(d.agents) && Array.isArray(d.events)) return d
-    }
-  } catch {
-    /* Usa uma nova demonstração se o armazenamento não estiver disponível. */
-  }
-  return seed()
 }
 function dateLabel(value: string | null) {
   return value
@@ -48,82 +36,29 @@ function dateLabel(value: string | null) {
 
 export default function App() {
   const [page, setPage] = useState('home')
-  const [mode, setMode] = useState<'demo' | 'server'>('demo')
-  const [demo, setDemo] = useState<CityData>(readDemo)
-  const [server, setServer] = useState<CityData>(initialData)
-  const [serverRisks, setServerRisks] = useState<Risk[]>([])
-  const [serverTrend, setServerTrend] = useState({ recent: 0, previous: 0 })
-  const [connected, setConnected] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [updated, setUpdated] = useState<string | null>(null)
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [category, setCategory] = useState<Category>('equipment')
   const [editor, setEditor] = useState<{ entry: Entry | null; category: Category } | null>(null)
-  const [now, setNow] = useState(() => Date.now())
-  const data = mode === 'demo' ? demo : server
-  const persist = (next: CityData) => {
-    setDemo(next)
-    setNow(Date.now())
-    setUpdated(new Date().toISOString())
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(next))
-    } catch {
-      setError('Alterações mantidas nesta sessão, mas o navegador não permitiu salvá-las.')
-    }
-  }
-  const refresh = useCallback(async () => {
-    if (mode !== 'server') return
-    setLoading(true)
-    try {
-      const session = await api.session()
-      if (!session.authenticated) {
-        setConnected(false)
-        throw new Error('Entre na central para carregar o inventário do servidor.')
-      }
-      const next = await api.loadCity()
-      setNow(Date.now())
-      setServer(next.data)
-      setServerRisks(next.risks)
-      setServerTrend(next.trend)
-      setConnected(true)
-      setUpdated(new Date().toISOString())
-      setError('')
-    } catch (e) {
-      setConnected(false)
-      setError((e as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }, [mode])
-  useEffect(() => {
-    if (mode === 'demo') {
-      const timer = setInterval(() => setNow(Date.now()), 5000)
-      return () => clearInterval(timer)
-    }
-    const startup = setTimeout(() => void refresh(), 0)
-    const timer = setInterval(() => void refresh(), 5000)
-    return () => {
-      clearTimeout(startup)
-      clearInterval(timer)
-    }
-  }, [mode, refresh])
-  useEffect(() => {
-    let active = true
-    void api
-      .session()
-      .then((session) => {
-        if (active && session.authenticated) {
-          setEditor(null)
-          setFilters(emptyFilters)
-          setMode('server')
-        }
-      })
-      .catch(() => {})
-    return () => {
-      active = false
-    }
+  const onServerRecognized = useCallback(() => {
+    setEditor(null)
+    setFilters(emptyFilters)
   }, [])
+  const {
+    mode,
+    demo,
+    data,
+    serverRisks,
+    serverTrend,
+    connected,
+    loading,
+    error,
+    updated,
+    now,
+    persist,
+    refresh,
+    setError,
+    returnToDemo,
+  } = useCityConnection(onServerRecognized)
   const equipment = useMemo(() => filterEntries(data.equipment, filters), [data.equipment, filters])
   const agents = useMemo(
     () =>
@@ -224,124 +159,6 @@ export default function App() {
             now - Date.parse(e.timestamp) <= 14 * 86400000,
         ).length
   const disabled = mode === 'server' && !connected
-  const filterBar = (
-    <div className="filters">
-      <label className="search-label">
-        Buscar
-        <input
-          placeholder="Identificação, bairro ou órgão"
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-        />
-      </label>
-      {(page !== 'inventory' || category === 'equipment') && (
-        <label>
-          Tipo
-          <select
-            value={filters.kind}
-            onChange={(e) => setFilters({ ...filters, kind: e.target.value })}
-          >
-            <option value="">Todos os tipos</option>
-            {Object.entries(kinds).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      <label>
-        Situação
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-        >
-          <option value="">Todas</option>
-          {Object.entries(
-            page === 'inventory' && category === 'agent' ? agentStatuses : statuses,
-          ).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Região
-        <select
-          value={filters.region}
-          onChange={(e) => setFilters({ ...filters, region: e.target.value })}
-        >
-          <option value="">Todas</option>
-          {regions.map((r) => (
-            <option key={r}>{r}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Órgão
-        <select
-          value={filters.agency}
-          onChange={(e) => setFilters({ ...filters, agency: e.target.value })}
-        >
-          <option value="">Todos</option>
-          {agencies.map((r) => (
-            <option key={r}>{r}</option>
-          ))}
-        </select>
-      </label>
-      <button className="ghost" onClick={() => setFilters(emptyFilters)}>
-        Limpar
-      </button>
-    </div>
-  )
-  function resourceTable(rows: Entry[], c: Category) {
-    return (
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>{c === 'equipment' ? 'Equipamento' : 'Agente'}</th>
-              <th>Situação</th>
-              <th>Localização</th>
-              <th>Órgão</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((e) => (
-              <tr key={e.id}>
-                <td>
-                  <strong>{c === 'equipment' ? e.serial : e.name}</strong>
-                  <small>
-                    {c === 'equipment' ? kinds[e.kind] : e.role + ' · ' + e.registration}
-                  </small>
-                </td>
-                <td>
-                  <span className={`badge ${e.status}`}>
-                    {(c === 'equipment' ? statuses : agentStatuses)[e.status]}
-                  </span>
-                </td>
-                <td>
-                  {e.neighborhood}
-                  <small>{e.region}</small>
-                </td>
-                <td>{e.agency}</td>
-                <td>
-                  <button className="ghost small" onClick={() => openEntry(e, c)}>
-                    Ver detalhes
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {rows.length === 0 && (
-          <div className="empty-state">Nenhum registro encontrado com esses filtros.</div>
-        )}
-      </div>
-    )
-  }
   return (
     <main className={`shell ${page === 'home' ? 'home' : ''}`}>
       <header className="topbar">
@@ -363,9 +180,7 @@ export default function App() {
             <button
               className="ghost small"
               onClick={() => {
-                void api.logout().catch(() => {})
-                setMode('demo')
-                setConnected(false)
+                returnToDemo()
                 setPage('home')
               }}
             >
@@ -504,7 +319,15 @@ export default function App() {
               ))}
             </div>
           )}
-          {filterBar}
+          <ResourceFilters
+            filters={filters}
+            onChange={setFilters}
+            page={page}
+            category={category}
+            regions={regions}
+            agencies={agencies}
+            onClear={() => setFilters(emptyFilters)}
+          />
           {page === 'inventory' && (
             <>
               <div className="list-meta">
@@ -532,7 +355,11 @@ export default function App() {
                   Django.
                 </p>
               )}
-              {resourceTable(category === 'equipment' ? equipment : agents, category)}
+              <ResourceTable
+                rows={category === 'equipment' ? equipment : agents}
+                category={category}
+                onOpen={openEntry}
+              />
             </>
           )}
           {page === 'operations' && (
@@ -619,8 +446,10 @@ export default function App() {
               </div>
               <div className="panel">
                 <h2>Consultar recursos</h2>
-                {resourceTable(equipment, 'equipment')}
-                {agents.length > 0 && resourceTable(agents, 'agent')}
+                <ResourceTable rows={equipment} category="equipment" onOpen={openEntry} />
+                {agents.length > 0 && (
+                  <ResourceTable rows={agents} category="agent" onOpen={openEntry} />
+                )}
               </div>
               <div className="panel">
                 <h2>Histórico de eventos</h2>
