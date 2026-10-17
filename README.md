@@ -117,6 +117,14 @@ Os testes cobrem banco disponível, banco indisponível e rejeição de métodos
 O fluxo SQLite foi verificado neste ambiente. A opção MySQL/Docker está configurada, mas não foi executada aqui, pois Docker não está instalado. Ainda é necessário validá-la em uma máquina com Docker antes de considerá-la pronta para entrega.
 
 
+## Visualização da interface
+
+A interface atual pode ser consultada em https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site (acesso privado). Essa visualização serve apenas os arquivos estáticos de React. Django e PHP não estão hospedados nesse endereço; por isso, “Central indisponível” é esperado. O endpoint Django foi executado separadamente com HTTP 200 e os três testes da base passaram. Esta visualização ainda não possui os módulos do desafio.
+
+## Próxima implementação
+
+A proposta dos módulos e da integração com o serviço PHP está em [Especificação da solução](docs/superpowers/specs/2026-10-17-fenix-completo-design.md). O PHP está previsto para relatórios CSV, com autenticação entre serviços e dados fornecidos pelo Django. Essa parte ainda não foi implementada. A especificação está em revisão.
+
 ## Participação de inteligência artificial
 
 ChatGPT/Codex foi utilizado para auxiliar na interpretação dos requisitos, a organização do raciocínio, proposta de arquitetura, configuração do ambiente e geração da base inicial de código, estilos, testes e documentação foi feito inteiramente de forma humana.
