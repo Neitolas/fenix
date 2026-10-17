@@ -14,7 +14,6 @@ import {
 import * as api from './api'
 import EntryForm from './components/EntryForm'
 import CityMap from './components/CityMap'
-import Modal from './components/Modal'
 
 const emptyFilters: Filters = { search: '', kind: '', status: '', region: '', agency: '' }
 const initialData: CityData = { equipment: [], agents: [], events: [] }
@@ -61,10 +60,6 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [category, setCategory] = useState<Category>('equipment')
   const [editor, setEditor] = useState<{ entry: Entry | null; category: Category } | null>(null)
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [resetConfirm, setResetConfirm] = useState(false)
   const [now, setNow] = useState(() => Date.now())
   const data = mode === 'demo' ? demo : server
   const persist = (next: CityData) => {
@@ -113,6 +108,22 @@ export default function App() {
       clearInterval(timer)
     }
   }, [mode, refresh])
+  useEffect(() => {
+    let active = true
+    void api
+      .session()
+      .then((session) => {
+        if (active && session.authenticated) {
+          setEditor(null)
+          setFilters(emptyFilters)
+          setMode('server')
+        }
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
   const equipment = useMemo(() => filterEntries(data.equipment, filters), [data.equipment, filters])
   const agents = useMemo(
     () =>
@@ -332,7 +343,7 @@ export default function App() {
     )
   }
   return (
-    <main className="shell">
+    <main className={`shell ${page === 'home' ? 'home' : ''}`}>
       <header className="topbar">
         <button className="brand" onClick={() => openPage('home')} aria-label="Fênix, início">
           F.E.N.I.X.<span>Mobilidade urbana</span>
@@ -348,15 +359,6 @@ export default function App() {
                 ? 'Servidor conectado'
                 : 'Central indisponível'}
           </span>
-          <button
-            className="ghost small"
-            onClick={() => {
-              setLoginOpen(true)
-              setError('')
-            }}
-          >
-            Conectar Django
-          </button>
           {mode === 'server' && (
             <button
               className="ghost small"
@@ -389,33 +391,20 @@ export default function App() {
           </button>
         ))}
       </nav>
-      <div className="mode-banner">
-        {mode === 'demo' ? (
-          <>
-            <span className="demo-dot" />
-            <span>
-              <strong>Ambiente de demonstração.</strong> Dados fictícios salvos apenas neste
-              navegador. Nenhuma conexão com equipamentos reais.
-            </span>
-            <button className="text-button" onClick={() => setResetConfirm(true)}>
-              Restaurar exemplos
-            </button>
-          </>
-        ) : (
-          <>
-            <span>
-              Dados do Django · Atualização a cada 5 segundos ·{' '}
-              {updated
-                ? 'Última leitura: ' + new Date(updated).toLocaleTimeString('pt-BR')
-                : 'Aguardando leitura'}
-              {!connected && ' · Dados podem estar desatualizados'}
-            </span>
-            <button className="text-button" onClick={() => void refresh()} disabled={loading}>
-              {loading ? 'Atualizando…' : 'Atualizar'}
-            </button>
-          </>
-        )}
-      </div>
+      {mode === 'server' && page !== 'home' && (
+        <div className="server-update">
+          <span>
+            {updated
+              ? 'Última leitura: ' +
+                new Date(updated).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+              : 'Aguardando leitura'}
+            {!connected && ' · Dados podem estar desatualizados'}
+          </span>
+          <button className="text-button" onClick={() => void refresh()} disabled={loading}>
+            {loading ? 'Atualizando…' : 'Atualizar'}
+          </button>
+        </div>
+      )}
       {error && (
         <p className="notice error" role="alert">
           {error}
@@ -773,94 +762,6 @@ export default function App() {
           onDelete={remove}
           onEvent={event}
         />
-      )}
-      {loginOpen && (
-        <Modal compact labelledBy="login-title" onClose={() => setLoginOpen(false)}>
-          <h2 id="login-title">Conectar ao Django</h2>
-          <p className="muted">
-            Requer a execução integrada. A visualização estática do ChatGPT não hospeda o backend.
-          </p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              setLoading(true)
-              setError('')
-              void api
-                .login(username, password)
-                .then(() => {
-                  setMode('server')
-                  setLoginOpen(false)
-                  setPassword('')
-                })
-                .catch((e) => setError(e.message))
-                .finally(() => setLoading(false))
-            }}
-          >
-            <label>
-              Usuário
-              <input
-                autoComplete="username"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </label>
-            <label>
-              Senha
-              <input
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-            {error && (
-              <p className="notice error" role="alert">
-                {error}
-              </p>
-            )}
-            <div className="dialog-actions">
-              <button className="primary" disabled={loading}>
-                {loading ? 'Conectando…' : 'Entrar'}
-              </button>
-              <button
-                type="button"
-                className="ghost"
-                onClick={() => {
-                  setLoginOpen(false)
-                  setError('')
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
-      {resetConfirm && (
-        <Modal compact labelledBy="reset-title" onClose={() => setResetConfirm(false)}>
-          <h2 id="reset-title">Restaurar demonstração?</h2>
-          <p>
-            Os cadastros e eventos locais serão substituídos pelos exemplos fictícios. O servidor
-            não será alterado.
-          </p>
-          <div className="dialog-actions">
-            <button
-              className="danger"
-              onClick={() => {
-                persist(seed())
-                setResetConfirm(false)
-                setFilters(emptyFilters)
-              }}
-            >
-              Restaurar exemplos
-            </button>
-            <button className="ghost" onClick={() => setResetConfirm(false)}>
-              Cancelar
-            </button>
-          </div>
-        </Modal>
       )}
     </main>
   )

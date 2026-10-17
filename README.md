@@ -30,9 +30,9 @@ Sessão: autenticação Django e proteção CSRF para escritas. Administração 
 
 https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site
 
-A visualização privada serve a interface compilada de React. **Ela abre em demonstração local**, com dados fictícios identificados e persistidos apenas no navegador. É possível cadastrar, editar, excluir, filtrar e registrar eventos demonstrativos. “Restaurar exemplos” substitui apenas os dados locais após confirmação.
+A visualização privada serve a interface compilada de React. **Ela abre em demonstração local**, com dados fictícios identificados e persistidos apenas no navegador. É possível cadastrar, editar, excluir, filtrar e registrar eventos demonstrativos. Para reiniciar os exemplos, remova a chave `fenix-demo-v1` do armazenamento local do navegador.
 
-Esse endereço não hospeda Django nem PHP. A opção “Conectar Django” serve para a execução integrada por mesma origem; não cria uma conexão automática do site privado com o localhost do computador. Exportar CSV requer a execução integrada e fica indisponível na demonstração. Os mapas externos dependem de rede; as listas continuam disponíveis se os mapas não carregarem.
+Esse endereço não hospeda Django nem PHP. Na execução integrada, entre em `http://127.0.0.1:8000/admin/` com o usuário criado e recarregue a interface: ela reconhece a sessão autenticada pela mesma origem. O site privado não se conecta automaticamente ao localhost do computador. Exportar CSV requer a execução integrada e fica indisponível na demonstração. Os mapas externos dependem de rede; as listas continuam disponíveis se os mapas não carregarem.
 
 ## Executar o projeto integrado
 
@@ -78,7 +78,7 @@ npm ci
 npm run dev
 ```
 
-Abra http://127.0.0.1:5173 e use “Conectar Django” com o usuário criado. A interface troca explicitamente da demonstração para os dados do servidor. O proxy do Vite encaminha `/api` ao Django e preserva a mesma origem para cookies e CSRF.
+Entre em http://127.0.0.1:8000/admin/ com o usuário criado. Em seguida, abra ou recarregue http://127.0.0.1:5173; a interface reconhece a sessão e carrega os dados do servidor. Use o mesmo host `127.0.0.1` nos dois endereços para compartilhar o cookie. O proxy do Vite encaminha `/api` ao Django e preserva a mesma origem para cookies e CSRF.
 
 No terceiro terminal, com o ambiente Python ativado e PHP disponível no PATH:
 
@@ -154,3 +154,11 @@ O prazo do enunciado é 27/10/2026 às 23h59. O repositório está privado duran
 ## Participação de inteligência artificial
 
 ChatGPT/Codex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente e implementação de código, estilos, testes e documentação. O nome F.E.N.I.X. e seu significado foram propostos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
+
+## Aparência da página inicial
+
+O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 901 px de largura, sem alterar a configuração de zoom do navegador. Em telas menores, mantém a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração permanece no cabeçalho.
+
+A arte foi adaptada com a ferramenta integrada de geração de imagens, usando a imagem de fênix enviada pelo participante. Prompt utilizado:
+
+> Use case: stylized-concept. Asset type: widescreen website homepage wallpaper for F.E.N.I.X., a dark urban mobility dashboard. Adapt the attached phoenix artwork into a refined wide landscape 16:9 painterly wallpaper. Preserve the reference's majestic phoenix with outstretched wings, painterly oil-like texture, amber and gold fire, orange crimson clouds and radiant halo. Place the entire bird and its readable outstretched wings in the RIGHT half, centered around 72% width and 43% height, with a long glowing tail downward. Left 50% should be quiet almost black charcoal-green atmospheric smoke (#141716), subtle warm embers near the bottom, and very low visual detail to allow overlay text. Seamless natural transition from dark left to luminous gold upper-right, dark crimson lower-right. Dramatic but restrained, elegant painterly concept art, not a poster. Keep most edges and lower region dark to blend with #141716 UI. No text, no typography, no logo, no borders, no UI. Output a high resolution wide landscape image.

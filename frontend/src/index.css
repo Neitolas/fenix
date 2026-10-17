@@ -14,6 +14,73 @@ body {
   margin: 0;
   min-width: 320px;
 }
+body:has(.shell.home) {
+  background:
+    linear-gradient(180deg, rgba(20, 23, 22, 0.32), rgba(20, 23, 22, 0.08) 48%, #141716 100%),
+    url('./assets/fenix-wallpaper.webp') center top / cover no-repeat fixed;
+}
+.shell.home {
+  min-height: 100dvh;
+}
+.home .topbar,
+.home .main-nav {
+  border-color: rgba(231, 174, 83, 0.2);
+}
+.home .hero {
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 100px 0 80px;
+}
+.home h1 {
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
+}
+.home .modules {
+  background: rgba(20, 23, 22, 0.65);
+  backdrop-filter: blur(16px);
+}
+.home .module-card {
+  background: rgba(24, 29, 25, 0.82);
+}
+.server-update {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  color: #a8b0a9;
+  font-size: 12px;
+}
+@media (min-width: 901px) {
+  #root {
+    zoom: 0.75;
+  }
+  #root > .shell {
+    max-width: 1600px;
+  }
+  .shell.home {
+    min-height: calc(100dvh / 0.75);
+  }
+  .home .hero {
+    min-height: clamp(420px, 57dvh, 660px);
+  }
+}
+@media (max-width: 900px) {
+  body:has(.shell.home) {
+    background-position: 58% top;
+  }
+  .home .hero {
+    min-height: 380px;
+    padding: 70px 0 60px;
+  }
+  .home h1 {
+    text-shadow:
+      0 2px 18px #141716,
+      0 0 60px #141716;
+  }
+}
 .shell {
   max-width: 1240px;
   padding: 0 52px;

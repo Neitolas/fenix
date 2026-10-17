@@ -1,14 +1,65 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, cleanup, within } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
+import * as api from './api'
+import { seed } from './domain'
 vi.mock('./components/CityMap', () => ({ default: () => <div>Mapa de recursos</div> }))
 beforeEach(() => {
   localStorage.clear()
   window.scrollTo = vi.fn()
+  vi.spyOn(api, 'session').mockResolvedValue({ authenticated: false, username: '', csrf: '' })
 })
-afterEach(() => cleanup())
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 describe('Fluxos da central', () => {
+  it('fecha um cadastro demonstrativo antes de reconhecer uma sessão do servidor', async () => {
+    const session = { authenticated: true, username: 'operador', csrf: 'test' }
+    let resolveSession!: (value: typeof session) => void
+    vi.mocked(api.session).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveSession = resolve
+        }),
+    )
+    vi.mocked(api.session).mockResolvedValue(session)
+    vi.spyOn(api, 'loadCity').mockResolvedValue({
+      data: seed(),
+      risks: [],
+      trend: { recent: 0, previous: 0 },
+    })
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Inventário' }))
+    await user.click(
+      within(screen.getByText('DEMO-001').closest('tr')!).getByRole('button', {
+        name: 'Ver detalhes',
+      }),
+    )
+    expect(screen.getByRole('dialog')).toBeTruthy()
+    await act(async () => resolveSession(session))
+    expect(await screen.findByText('Servidor conectado')).toBeTruthy()
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+  it('reconhece uma sessão autenticada sem exibir os controles removidos', async () => {
+    vi.mocked(api.session).mockResolvedValue({
+      authenticated: true,
+      username: 'operador',
+      csrf: 'test',
+    })
+    vi.spyOn(api, 'loadCity').mockResolvedValue({
+      data: seed(),
+      risks: [],
+      trend: { recent: 0, previous: 0 },
+    })
+    render(<App />)
+    expect(screen.queryByText('Conectar Django')).toBeNull()
+    expect(screen.queryByText('Restaurar exemplos')).toBeNull()
+    expect(screen.queryByText('Ambiente de demonstração.')).toBeNull()
+    expect(await screen.findByText('Servidor conectado')).toBeTruthy()
+  })
   it('abre os três módulos mantendo a demonstração identificada', async () => {
     const user = userEvent.setup()
     render(<App />)
