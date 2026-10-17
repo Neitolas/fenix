@@ -7,6 +7,8 @@ services:
       DJANGO_DEBUG: "true"
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Configure DJANGO_SECRET_KEY}
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      REPORT_SERVICE_URL: http://reports:9080
+      REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
       DB_ENGINE: mysql
       MYSQL_HOST: db
       MYSQL_PORT: "3306"
@@ -16,8 +18,16 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
+      reports:
+        condition: service_started
       db:
         condition: service_healthy
+  reports:
+    profiles: [mysql]
+    build: ./reports-php
+    environment:
+      REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
+    expose: ["9080"]
   db:
     profiles: [mysql]
     image: mysql:8.4

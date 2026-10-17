@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validar configuração dos serviços
+        env:
+          DJANGO_SECRET_KEY: ci-only
+          REPORT_SERVICE_TOKEN: ci-only
+          MYSQL_DATABASE: fenix
+          MYSQL_USER: fenix
+          MYSQL_PASSWORD: ci-only
+          MYSQL_ROOT_PASSWORD: ci-only
+        run: docker compose --profile mysql config --quiet
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -16,7 +25,8 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r backend/requirements.txt
       - run: python backend/manage.py check
-      - run: python backend/manage.py test config
+      - run: python backend/manage.py makemigrations --check --dry-run
+      - run: python backend/manage.py test config operations
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -30,5 +40,16 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - run: npm test
       - run: npm run lint
       - run: npm run build
+  reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - run: php -l reports-php/index.php
+      - run: php reports-php/tests.php

@@ -18,6 +18,7 @@ ALLOWED_HOSTS = [host.strip() for host in os.getenv(
 ).split(',') if host.strip()]
 
 INSTALLED_APPS = [
+    'operations',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

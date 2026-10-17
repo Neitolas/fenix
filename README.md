@@ -2,53 +2,49 @@
 
 Uma cidade capaz de recomeçar.
 
-Base de desenvolvimento para a etapa bônus do DSIN Coder Challenge 2026. O F.E.N.I.X. faz parte da iniciativa F.O.G.O., no universo do Protocolo PROMETHEUS. A proposta é reunir informações sobre equipamentos e agentes para apoiar a recuperação e a prevenção de falhas na mobilidade urbana.
+Projeto para a etapa bônus do DSIN Coder Challenge 2026. Dentro da iniciativa F.O.G.O., o F.E.N.I.X. reúne inventário, operação e prevenção para apoiar a recuperação da cidade no universo de PROMETHEUS.
 
-## Identidade e origem da proposta
+## Identidade e decisões
 
-F.E.N.I.X. representa **Força, Evolução do Nutrir, Integração e X (Incógnita/Potencial)**. O nome e essa interpretação foram propostos pelo participante. A referência à fênix aproxima o projeto da ideia de renascer das cinzas: recuperar o controle da cidade e usar o aprendizado das falhas para melhorar sua operação. Aqui, nutrir significa alimentar as decisões com informações confiáveis.
+F.E.N.I.X. representa **Força, Evolução do Nutrir, Integração e X (Incógnita/Potencial)**. O nome e o significado foram propostos pelo participante. A referência à fênix traduz o renascimento: conhecer os recursos, recuperar o funcionamento e aprender com as falhas. Nutrir, nesse contexto, significa alimentar decisões com informações confiáveis.
 
-A leitura do enunciado organizou o problema em três necessidades: conhecer os recursos, acompanhar o presente e antecipar riscos. Essa divisão orienta as futuras áreas de Inventário, Operação e Prevenção. A narrativa dá identidade ao projeto; as telas devem continuar objetivas para quem trabalha na central.
+A solução foi organizada a partir das três necessidades do enunciado. React/TypeScript cuida da interface; Django concentra dados e regras; PHP gera relatórios CSV sem receber acesso ao banco. Essa divisão permite demonstrar as tecnologias informadas no perfil do participante sem duplicar cadastros entre duas linguagens.
 
-## Estado atual
+SQLite facilita a primeira execução. MySQL está configurado como alternativa no Docker Compose. O índice de atenção usa regras abertas, e não uma suposta inteligência preditiva sem dados suficientes.
 
-Este repositório contém o ambiente inicial, e não a solução completa do desafio.
+## O que está implementado
 
-Disponível: frontend React com TypeScript e Vite; tela inicial responsiva; API Django com verificação de conexão ao banco; SQLite para desenvolvimento; configuração opcional de MySQL com Docker; testes da API e workflow de verificações para GitHub Actions.
+Inventário: cadastro, pesquisa, filtros, detalhes, edição e exclusão lógica de equipamentos e agentes. Equipamentos incluem endereço, GPS, número de série, marca, modelo, situação, manutenção e características JSON. Agentes incluem matrícula por órgão, função, localização e situação.
 
-Ainda não implementado: cadastros de equipamentos e agentes, mapa, autenticação da central, telemetria, indicadores, manutenção, histórico e análises preditivas. Os três cartões da tela inicial são informativos e estão identificados como em desenvolvimento. Nenhum indicador operacional fictício é apresentado como real.
+Operação: mapa Leaflet/OpenStreetMap, indicadores, alertas de manutenção, visão por região e histórico. Na conexão com Django, os dados são atualizados a cada cinco segundos. Eventos manuais simulam atividade, falha e manutenção concluída. O servidor mantém histórico, rejeita eventos futuros inválidos e evita duplicação pelo identificador externo.
 
-## Decisões técnicas
+O histórico preserva as coordenadas enviadas e o estado informado por cada evento. Atividade, posição e estado têm ordenação independente: uma falha atrasada pode atualizar o estado se não houver outra transição posterior, mas não substitui uma recuperação mais recente. Coordenadas antigas ficam no histórico sem mover o marcador atual. Eventos sem posição ou transição exibem esses campos vazios. A busca usa conversão Unicode para minúsculas também no servidor, mantendo o filtro do CSV consistente com a interface em SQLite e MySQL; em bases maiores, essa busca precisa de índice normalizado.
 
-React e TypeScript organizam a interface em componentes e tornam os contratos de dados explícitos. Django fornece uma base conhecida para regras de negócio, banco de dados e administração. Essas tecnologias foram escolhidas considerando as competências informadas pelo participante e a necessidade de conseguir explicar a solução.
+Prevenção: índice de atenção de 0 a 100 com fatores e recomendações visíveis, além da comparação de falhas em duas janelas de sete dias. A pontuação não é uma probabilidade estatística de falha. Indisponibilidade atual e risco preventivo são apresentados separadamente.
 
-SQLite permite executar a base sem instalar um servidor de banco. MySQL é a alternativa prevista para integração. O proxy do Vite encaminha `/api` para o Django em desenvolvimento, evitando configuração desnecessária de CORS. Isso não representa uma configuração de produção.
+Relatórios: endpoint Django autenticado chama PHP pela rede interna. PHP valida o contrato e gera CSV UTF-8 com proteção contra fórmulas de planilha. Falha do serviço é apresentada ao usuário; não há geração silenciosa em Python fingindo ser PHP.
 
-As futuras previsões começarão com regras e estatísticas explicáveis. A intenção é mostrar os dados considerados, o motivo do alerta e a ação sugerida, sem apresentar um índice arbitrário como probabilidade validada. A primeira hipótese a avaliar será o risco de indisponibilidade de equipamentos a partir de falhas recentes e manutenção vencida. Essa regra ainda será especificada e implementada.
+Sessão: autenticação Django e proteção CSRF para escritas. Administração disponível em `/admin/`. O projeto ainda não passou por uma revisão de implantação em produção.
 
-## Estrutura
+## Visualização no ChatGPT
 
-- `frontend/`: interface, estilos e configuração do Vite.
-- `backend/config/`: configuração Django, URLs, endpoint de saúde e testes.
-- `backend/requirements.txt`: versões instaladas no ambiente Python.
-- `backend/requirements-mysql.txt`: dependências adicionais de MySQL.
-- `compose.yaml`: banco e API para desenvolvimento com MySQL.
-- `.github/workflows/checks.yml`: verificações para pushes e pull requests.
-- `.env.example`: valores de exemplo, exclusivos para desenvolvimento local.
+https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site
 
-## Requisitos
+A visualização privada serve a interface compilada de React. **Ela abre em demonstração local**, com dados fictícios identificados e persistidos apenas no navegador. É possível cadastrar, editar, excluir, filtrar e registrar eventos demonstrativos. “Restaurar exemplos” substitui apenas os dados locais após confirmação.
 
-Python 3.12, Node.js 24 e npm. Para a opção MySQL, Docker com Compose v2. As fontes externas da interface são opcionais; se não houver rede, o navegador usa uma fonte local.
+Esse endereço não hospeda Django nem PHP. A opção “Conectar Django” serve para a execução integrada por mesma origem; não cria uma conexão automática do site privado com o localhost do computador. Exportar CSV requer a execução integrada e fica indisponível na demonstração. Os mapas externos dependem de rede; as listas continuam disponíveis se os mapas não carregarem.
 
-## Execução local com SQLite
+## Executar o projeto integrado
 
-Execute os comandos a partir da raiz do projeto.
+Requisitos: Python 3.12, Node.js 24, npm e PHP 8.3 ou superior. Para MySQL, Docker com Compose v2. Não é preciso contratar um serviço pago para executar localmente.
 
 ```sh
+git clone https://github.com/Neitolas/fenix.git
+cd fenix
 python -m venv .venv
 ```
 
-Ative o ambiente no Windows PowerShell:
+No Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
@@ -62,13 +58,17 @@ source .venv/bin/activate
 cp .env.example .env
 ```
 
-Instale as dependências e inicie o Django no primeiro terminal:
+No primeiro terminal, com o ambiente ativado:
 
 ```sh
 python -m pip install -r backend/requirements.txt
 python backend/manage.py migrate
+python backend/manage.py seed_demo
+python backend/manage.py createsuperuser
 python backend/manage.py runserver 127.0.0.1:8000
 ```
+
+Escolha seu próprio usuário e senha. O comando `seed_demo` cria 12 equipamentos, seis agentes e eventos fictícios em torno de Marília; pode ser repetido sem duplicar os exemplos nem sobrescrever edições existentes. Ele não cria uma senha padrão.
 
 No segundo terminal:
 
@@ -78,53 +78,79 @@ npm ci
 npm run dev
 ```
 
-Abra http://127.0.0.1:5173. Com o Django e o banco disponíveis, a página deve mostrar “Conexão estabelecida”. O endpoint http://127.0.0.1:8000/api/health/ consulta o banco e devolve `status: ok`; uma falha de banco resulta em HTTP 503, sem revelar dados de conexão.
+Abra http://127.0.0.1:5173 e use “Conectar Django” com o usuário criado. A interface troca explicitamente da demonstração para os dados do servidor. O proxy do Vite encaminha `/api` ao Django e preserva a mesma origem para cookies e CSRF.
 
-A administração padrão do Django está em http://127.0.0.1:8000/admin/. Para criar um usuário, execute `python backend/manage.py createsuperuser`. Os modelos de equipamentos e agentes ainda não existem.
+No terceiro terminal, com o ambiente Python ativado e PHP disponível no PATH:
 
-## Execução alternativa com MySQL
+```sh
+python scripts/run_reports.py
+```
 
-Copie `.env.example` para `.env`. Mantenha o backend local desligado para liberar a porta 8000. Em seguida:
+O script carrega `.env` e inicia PHP em `127.0.0.1:9080`. O mesmo `REPORT_SERVICE_TOKEN` deve ser usado pelos dois serviços. Os valores de `.env.example` servem apenas ao desenvolvimento local. Não publique `.env`, senhas, `.venv`, bancos locais ou `node_modules`.
+
+## Alternativa com MySQL e PHP no Docker
+
+Com `.env` configurado e a API local desligada para liberar a porta 8000:
 
 ```sh
 docker compose --profile mysql up --build
 ```
 
-O Compose inicia MySQL e a API, aguarda o banco responder e aplica as migrações. O Dockerfile instala as bibliotecas nativas necessárias ao mysqlclient. Em outro terminal, execute `npm ci` e `npm run dev` em `frontend/` como na opção anterior. Não é necessário alterar `DB_ENGINE` no arquivo `.env`: o Compose define MySQL dentro do contêiner da API.
+O Compose inicia MySQL, Django e PHP. A API aguarda o banco e aplica as migrações; o serviço PHP não expõe porta na máquina hospedeira. Em outro terminal:
 
-Para usar Python local com o banco do Docker, instale as bibliotecas de compilação do mysqlclient apropriadas ao seu sistema, instale `backend/requirements-mysql.txt`, altere `DB_ENGINE=mysql` em `.env`, inicie somente `docker compose --profile mysql up -d db` e execute as migrações localmente.
+```sh
+docker compose --profile mysql exec api python manage.py seed_demo
+docker compose --profile mysql exec api python manage.py createsuperuser
+```
 
-Os dados do MySQL ficam no volume `fenix_mysql`. `docker compose --profile mysql down` encerra os serviços e preserva o volume. As senhas de exemplo servem apenas ao desenvolvimento; configure credenciais próprias antes de qualquer publicação.
+Execute o frontend com npm como na seção anterior. `docker compose --profile mysql down` encerra os serviços preservando o volume do banco. Não use `down -v` se quiser preservar esses dados.
 
-## Verificações
+## Regras do índice e dos indicadores
 
-Com o ambiente Python ativo:
+Manutenção imediata soma 40 pontos. Manutenção programada vencida soma 25; prevista nos próximos sete dias, 10. Cada falha nos últimos sete dias soma 10, limitada a 30. Ausência de sinal por mais de 30 minutos soma 15 somente quando já existe histórico de telemetria. Vencida e próxima não se acumulam. O total é limitado a 100.
+
+Atenção baixa: 0–24; moderada: 25–49; alta: 50–74; crítica: 75–100. Uma falha manual muda o equipamento para mau funcionamento e manutenção imediata. A manutenção concluída encerra a pendência e devolve o equipamento à situação operacional.
+
+Disponibilidade = operacionais ÷ (operacionais + indisponíveis). Não instalados ficam fora do denominador. Sem equipamentos elegíveis, a tela mostra “Sem dados”. Os fatores preventivos não são usados para inventar previsões de criminalidade ou de tráfego sem dados dessas ocorrências.
+
+## Estrutura
+
+- `backend/operations/`: modelos, formulários, API, eventos, serviços de análise, administração e testes.
+- `backend/config/`: configuração e rotas do Django.
+- `frontend/src/`: interface React, cliente da API, regras da demonstração e testes.
+- `frontend/src/components/`: mapa, formulários e diálogos acessíveis.
+- `reports-php/`: contrato CSV, serviço HTTP, Dockerfile e testes PHP.
+- `scripts/run_reports.py`: inicialização local do serviço PHP.
+- `docs/superpowers/`: especificação, plano e registro do desenvolvimento.
+- `.github/workflows/checks.yml`: verificações de backend, frontend e relatórios.
+
+## Testar
 
 ```sh
 python backend/manage.py check
-python backend/manage.py test config
+python backend/manage.py makemigrations --check --dry-run
+python backend/manage.py test config operations
+php reports-php/tests.php
 ```
 
 No diretório `frontend/`:
 
 ```sh
+npm test
 npm run lint
 npm run build
 ```
 
-Os testes cobrem banco disponível, banco indisponível e rejeição de métodos de escrita no endpoint de saúde. O build verifica os tipos e gera os arquivos estáticos. GitHub Actions está configurado para executar essas verificações após a publicação do repositório.
+As verificações incluem regras da demonstração, navegação, cadastro persistido no navegador, evento simulado, validações e autenticação da API, histórico, indicadores, pontuação, custo das consultas e geração segura de CSV.
 
-O fluxo SQLite foi verificado neste ambiente. A opção MySQL/Docker está configurada, mas não foi executada aqui, pois Docker não está instalado. Ainda é necessário validá-la em uma máquina com Docker antes de considerá-la pronta para entrega.
+Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusive no teste HTTP de integração Django→PHP→CSV. O mesmo código está preparado para PHP CLI nativo. Docker/MySQL ainda não foram executados aqui. Os testes de interface usam DOM simulado; não substituem a conferência visual em diferentes navegadores nem validam a disponibilidade dos mapas externos.
 
+## Próximas validações
 
-## Visualização da interface
+Validar o caminho Docker/MySQL em instalação limpa, conferir o mapa e os formulários em navegadores reais, revisar segurança de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. A visualização estática não equivale à hospedagem dos três serviços integrados.
 
-A interface atual pode ser consultada em https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site (acesso privado). Essa visualização serve apenas os arquivos estáticos de React. Django e PHP não estão hospedados nesse endereço; por isso, “Central indisponível” é esperado. O endpoint Django foi executado separadamente com HTTP 200 e os três testes da base passaram. Esta visualização ainda não possui os módulos do desafio.
-
-## Próxima implementação
-
-A proposta dos módulos e da integração com o serviço PHP está em [Especificação da solução](docs/superpowers/specs/2026-10-17-fenix-completo-design.md). O PHP está previsto para relatórios CSV, com autenticação entre serviços e dados fornecidos pelo Django. Essa parte ainda não foi implementada. A especificação está em revisão.
+O prazo do enunciado é 27/10/2026 às 23h59. O repositório está privado durante o desenvolvimento; o material deverá ficar acessível aos avaliadores antes da submissão. O limite de envio informado é 50 MB.
 
 ## Participação de inteligência artificial
 
-ChatGPT/Codex auxiliou na interpretação dos requisitos, no planejamento, na configuração do ambiente e na geração da base inicial de código, estilos, testes e documentação. O nome F.E.N.I.X. e seu significado foram propostos pelo participante. A declaração será atualizada conforme o projeto evoluir. A aplicação não utiliza uma API de IA em tempo de execução.
+ChatGPT/Codex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente e implementação de código, estilos, testes e documentação. O nome F.E.N.I.X. e seu significado foram propostos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
