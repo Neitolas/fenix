@@ -122,11 +122,11 @@ O prazo informado no enunciado é 27/10/2026 às 23h59, no horário da organiza�
 
 O desenvolvimento previsto seguirá esta ordem: modelos e cadastros; mapa e filtros; manutenção e alertas; eventos simulados com identificação explícita; histórico e prevenção; revisão dos fluxos e vídeo demonstrativo. Essa lista é planejamento, não um histórico de funcionalidades concluídas.
 
-O repositório de desenvolvimento está em https://github.com/Neitolas/fenix e foi criado como privado. Para conectar uma cópia local ainda sem remoto, execute:
+O repositório de desenvolvimento está em https://github.com/Neitolas/fenix e foi criado como privado. Para obter uma cópia local com o histórico correto, execute:
 
 ```sh
-git remote add origin https://github.com/Neitolas/fenix.git
-git push -u origin main
+git clone https://github.com/Neitolas/fenix.git
+cd fenix
 ```
 
 O acesso remoto usa as credenciais do próprio desenvolvedor. O histórico registra a preparação do ambiente, sem simular etapas ou datas anteriores. Antes da submissão, será necessário disponibilizar o código aos avaliadores conforme as instruções do desafio.
