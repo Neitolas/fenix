@@ -238,7 +238,6 @@ export default function App() {
         <section className="workspace">
           <div className="page-heading">
             <div>
-              <p className="eyebrow">INICIATIVA F.O.G.O.</p>
               <h1>
                 {page === 'inventory'
                   ? 'Inventário da cidade'

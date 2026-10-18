@@ -21,6 +21,9 @@
   margin-inline: var(--layout-offset) 0;
   width: calc(100% - var(--layout-offset));
 }
+#root > .shell:not(.home) {
+  max-width: none;
+}
 .shell.home > .hero {
   min-height: 0;
   max-width: 720px;
