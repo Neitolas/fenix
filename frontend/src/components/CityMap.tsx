@@ -80,17 +80,11 @@ export default function CityMap({
       map.current.fitBounds(L.latLngBounds(points), { padding: [35, 35], maxZoom: 14 })
   }, [equipment, agents])
   return (
-    <>
-      <div
-        className="city-map"
-        ref={container}
-        role="region"
-        aria-label="Mapa dos equipamentos e agentes"
-      />
-      <p className="map-help">
-        Círculos maiores: equipamentos. Menores em azul: agentes. Clique para consultar. A lista
-        continua disponível sem o mapa.
-      </p>
-    </>
+    <div
+      className="city-map"
+      ref={container}
+      role="region"
+      aria-label="Mapa dos equipamentos e agentes"
+    />
   )
 }
