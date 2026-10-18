@@ -1,3 +1,17 @@
+.shell,
+.workspace,
+.panel,
+.filters,
+.form-grid,
+.metric,
+.risk-card,
+.region {
+  min-width: 0;
+}
+.shell {
+  position: relative;
+  --shell-gutter: 52px;
+}
 .table-wrap {
   max-width: 100%;
 }
@@ -14,6 +28,24 @@
   align-items: flex-start;
   text-align: left;
 }
+.shell.home .brand {
+  font-size: 30px;
+}
+.shell.home .brand span {
+  font-size: 12px;
+}
+.shell.home .eyebrow {
+  font-size: 13px;
+}
+.shell.home > .hero h1 {
+  font-size: clamp(44px, 6.4vw, 82px);
+}
+.main-nav button {
+  font-size: 18px;
+}
+.connection {
+  font-size: 14px;
+}
 .connection::before {
   flex-shrink: 0;
 }
@@ -22,11 +54,13 @@
 }
 .topbar .demo-corner {
   position: absolute;
-  top: max(24px, env(safe-area-inset-top));
-  right: max(24px, env(safe-area-inset-right));
+  top: auto;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: var(--shell-gutter);
+  right: auto;
   width: auto;
   max-width: calc(100% - 48px);
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 .main-nav {
   width: fit-content;
@@ -42,6 +76,7 @@
 
 @media (max-width: 1100px) {
   .shell {
+    --shell-gutter: 28px;
     padding-inline: 28px;
   }
   .filters {
@@ -82,6 +117,7 @@
 
 @media (max-width: 700px) {
   .shell {
+    --shell-gutter: max(16px, env(safe-area-inset-left));
     width: 100%;
     padding-right: max(16px, env(safe-area-inset-right));
     padding-left: max(16px, env(safe-area-inset-left));
@@ -102,13 +138,16 @@
   .brand {
     font-size: 25px;
   }
+  .shell.home .brand {
+    font-size: 27px;
+  }
   .header-actions {
     width: 100%;
     gap: 12px;
     justify-content: space-between;
   }
   .connection {
-    font-size: 12px;
+    font-size: 13px;
   }
   .main-nav {
     display: grid;
@@ -126,7 +165,7 @@
     min-width: 0;
     min-height: 48px;
     padding: 14px 3px;
-    font-size: 13px;
+    font-size: 14px;
   }
   .main-nav button:focus-visible {
     outline-offset: -4px;
@@ -139,6 +178,9 @@
     font-size: clamp(36px, 9.2vw, 58px);
     line-height: 1.1;
     margin-block: 20px;
+  }
+  .shell.home > .hero h1 {
+    font-size: clamp(38px, 9.8vw, 62px);
   }
   .workspace {
     padding-top: 28px;
@@ -353,7 +395,7 @@
 
 @media (max-width: 380px) {
   .main-nav button {
-    font-size: 12px;
+    font-size: 12.5px;
     padding-inline: 2px;
   }
   .metrics,
