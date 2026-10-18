@@ -2,19 +2,26 @@
   max-width: 100%;
 }
 .shell.home {
-  margin-inline: 0;
+  --home-offset: 30px;
+  margin-inline: var(--home-offset) 0;
+  width: calc(100% - var(--home-offset));
 }
 .shell.home > .hero {
   min-height: 0;
   max-width: 720px;
   padding-block: 40px 48px;
-  padding-inline-start: clamp(8px, 2vw, 32px);
   justify-content: flex-start;
   align-items: flex-start;
   text-align: left;
 }
 .connection::before {
   flex-shrink: 0;
+}
+
+@media (min-width: 1101px) and (hover: hover) and (pointer: fine) {
+  .shell.home {
+    --home-offset: 40px;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -329,6 +336,10 @@
 }
 
 @media (max-width: 380px) {
+  .main-nav button {
+    font-size: 12px;
+    padding-inline: 2px;
+  }
   .metrics,
   .metrics.three {
     grid-template-columns: minmax(0, 1fr);
