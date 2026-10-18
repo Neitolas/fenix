@@ -226,52 +226,14 @@ export default function App() {
         </p>
       )}
       {page === 'home' ? (
-        <>
-          <section className="hero" aria-labelledby="title">
-            <p className="eyebrow">INICIATIVA F.O.G.O.</p>
-            <h1 id="title">
-              Uma cidade capaz
-              <br />
-              de <em>recomeçar.</em>
-            </h1>
-          </section>
-          <section className="modules" aria-label="Frentes do projeto">
-            {[
-              [
-                'inventory',
-                '01',
-                'Inventário',
-                'Equipamentos e agentes reunidos em uma visão da cidade.',
-                `${data.equipment.length} equipamentos · ${data.agents.length} agentes`,
-              ],
-              [
-                'operations',
-                '02',
-                'Operação',
-                'Localização, disponibilidade e manutenção para apoiar decisões.',
-                `${metric.operational} equipamentos operacionais`,
-              ],
-              [
-                'prevention',
-                '03',
-                'Prevenção',
-                'Históricos que ajudam a identificar riscos antes das falhas.',
-                `${risks.filter((r) => r.score >= 25).length} equipamentos em atenção`,
-              ],
-            ].map(([key, num, title, text, detail]) => (
-              <button className="module-card" key={key} onClick={() => openPage(key)}>
-                <span className="number">
-                  {num}
-                  <span>↗</span>
-                </span>
-                <h2>{title}</h2>
-                <p>{text}</p>
-                <span className="stage">{detail}</span>
-                <span className="module-link">Abrir {title.toLowerCase()} →</span>
-              </button>
-            ))}
-          </section>
-        </>
+        <section className="hero" aria-labelledby="title">
+          <p className="eyebrow">INICIATIVA F.O.G.O.</p>
+          <h1 id="title">
+            Uma cidade capaz
+            <br />
+            de <em>recomeçar.</em>
+          </h1>
+        </section>
       ) : (
         <section className="workspace">
           <div className="page-heading">

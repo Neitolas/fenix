@@ -37,13 +37,6 @@ body:has(.shell.home) {
 .home h1 {
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
 }
-.home .modules {
-  background: rgba(20, 23, 22, 0.65);
-  backdrop-filter: blur(16px);
-}
-.home .module-card {
-  background: rgba(24, 29, 25, 0.82);
-}
 .server-update {
   display: flex;
   justify-content: space-between;
@@ -162,23 +155,12 @@ h1 em {
   font-size: 17px;
   line-height: 1.7;
 }
-.modules {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: 1px solid #343b35;
-  border-radius: 12px;
-  overflow: hidden;
-}
 article {
   padding: 28px;
   background: #1b201c;
 }
 article + article {
   border-left: 1px solid #343b35;
-}
-.number {
-  color: #d8aa61;
-  font-size: 12px;
 }
 h2 {
   font-size: 23px;
@@ -190,15 +172,6 @@ article p {
   font-size: 14px;
   line-height: 1.7;
   min-height: 48px;
-}
-.stage {
-  display: inline-block;
-  margin-top: 16px;
-  color: #c0c7c1;
-  font-size: 11px;
-  padding: 7px 10px;
-  border: 1px solid #454d46;
-  border-radius: 5px;
 }
 footer {
   color: #8d978f;
@@ -218,9 +191,6 @@ footer {
   }
   .hero {
     padding: 52px 0 40px;
-  }
-  .modules {
-    grid-template-columns: 1fr;
   }
   article + article {
     border-left: none;
@@ -358,38 +328,6 @@ button.brand {
   color: #e7ae53;
   margin-left: auto;
   flex-shrink: 0;
-  font-size: 12px;
-}
-.module-card {
-  text-align: left;
-  border: 0;
-  border-radius: 0;
-  padding: 28px;
-  background: #1b201c;
-}
-.module-card + .module-card {
-  border-left: 1px solid #343b35;
-}
-.module-card:hover {
-  background: #242c25;
-}
-.module-card .number {
-  display: flex;
-  justify-content: space-between;
-}
-.module-card h2 {
-  margin-top: 24px;
-}
-.module-card p {
-  color: #a8b0a9;
-  line-height: 1.7;
-  font-size: 14px;
-  min-height: 48px;
-}
-.module-link {
-  display: block;
-  margin-top: 20px;
-  color: #e7ae53;
   font-size: 12px;
 }
 .workspace {
@@ -864,10 +802,6 @@ article.risk-card + article.risk-card {
   }
   .text-button {
     margin-left: 16px;
-  }
-  .module-card + .module-card {
-    border-left: 0;
-    border-top: 1px solid #343b35;
   }
   .page-heading {
     align-items: flex-start;
