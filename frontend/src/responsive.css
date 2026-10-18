@@ -17,6 +17,22 @@
 .connection::before {
   flex-shrink: 0;
 }
+.topbar {
+  border-bottom: 0;
+}
+.topbar .demo-corner {
+  position: absolute;
+  top: max(24px, env(safe-area-inset-top));
+  right: max(24px, env(safe-area-inset-right));
+  width: auto;
+  max-width: calc(100% - 48px);
+  justify-content: flex-end;
+}
+.main-nav {
+  width: fit-content;
+  max-width: 100%;
+  border-top: 1px solid #303631;
+}
 
 @media (min-width: 1101px) and (hover: hover) and (pointer: fine) {
   .shell.home {

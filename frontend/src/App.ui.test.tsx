@@ -149,7 +149,7 @@ describe('Fluxos da central', () => {
   it('abre os três módulos mantendo a demonstração identificada', async () => {
     const user = userEvent.setup()
     render(<App />)
-    expect(screen.getByRole('status').textContent).toBe('Demonstração local')
+    expect(screen.getByRole('status').textContent).toBe('Demonstração')
     await user.click(screen.getByRole('button', { name: 'Inventário' }))
     expect(screen.getByRole('heading', { name: 'Inventário da cidade' })).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Operação' }))

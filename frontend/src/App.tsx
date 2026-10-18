@@ -165,13 +165,13 @@ export default function App() {
         <button className="brand" onClick={() => openPage('home')} aria-label="Fênix, início">
           F.E.N.I.X.<span>Mobilidade urbana</span>
         </button>
-        <div className="header-actions">
+        <div className={`header-actions${mode === 'demo' ? ' demo-corner' : ''}`}>
           <span
             className={`connection ${mode === 'demo' ? 'demo' : connected ? 'connected' : 'unavailable'}`}
             role="status"
           >
             {mode === 'demo'
-              ? 'Demonstração local'
+              ? 'Demonstração'
               : connected
                 ? 'Servidor conectado'
                 : 'Central indisponível'}
