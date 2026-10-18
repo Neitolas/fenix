@@ -32,10 +32,10 @@
   align-items: flex-start;
   text-align: left;
 }
-.shell.home .brand {
+.brand {
   font-size: 30px;
 }
-.shell.home .brand span {
+.brand span {
   font-size: 12px;
 }
 .shell.home .eyebrow {
@@ -140,9 +140,6 @@
     padding-bottom: 20px;
   }
   .brand {
-    font-size: 25px;
-  }
-  .shell.home .brand {
     font-size: 27px;
   }
   .header-actions {
