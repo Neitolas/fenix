@@ -11,14 +11,15 @@
 .shell {
   position: relative;
   --shell-gutter: 52px;
+  --layout-offset: 30px;
 }
 .table-wrap {
   max-width: 100%;
 }
-.shell.home {
-  --home-offset: 30px;
-  margin-inline: var(--home-offset) 0;
-  width: calc(100% - var(--home-offset));
+.shell.home,
+.shell:not(.home) {
+  margin-inline: var(--layout-offset) 0;
+  width: calc(100% - var(--layout-offset));
 }
 .shell.home > .hero {
   min-height: 0;
@@ -69,8 +70,8 @@
 }
 
 @media (min-width: 1101px) and (hover: hover) and (pointer: fine) {
-  .shell.home {
-    --home-offset: 40px;
+  .shell {
+    --layout-offset: 40px;
   }
 }
 
