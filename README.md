@@ -195,8 +195,16 @@ ChatGPT/Codex auxiliou na interpretação dos requisitos, planejamento, configur
 
 ## Aparência da página inicial
 
-O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 901 px de largura, sem alterar a configuração de zoom do navegador. Em telas menores, mantém a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração permanece no cabeçalho.
+O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 1101 px de largura em dispositivos com ponteiro preciso e suporte a hover, sem alterar o zoom do navegador. Celulares e tablets com toque mantêm a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração permanece no cabeçalho.
 
 A arte foi adaptada com a ferramenta integrada de geração de imagens, usando a imagem de fênix enviada pelo participante. Prompt utilizado:
 
 > Use case: stylized-concept. Asset type: widescreen website homepage wallpaper for F.E.N.I.X., a dark urban mobility dashboard. Adapt the attached phoenix artwork into a refined wide landscape 16:9 painterly wallpaper. Preserve the reference's majestic phoenix with outstretched wings, painterly oil-like texture, amber and gold fire, orange crimson clouds and radiant halo. Place the entire bird and its readable outstretched wings in the RIGHT half, centered around 72% width and 43% height, with a long glowing tail downward. Left 50% should be quiet almost black charcoal-green atmospheric smoke (#141716), subtle warm embers near the bottom, and very low visual detail to allow overlay text. Seamless natural transition from dark left to luminous gold upper-right, dark crimson lower-right. Dramatic but restrained, elegant painterly concept art, not a poster. Keep most edges and lower region dark to blend with #141716 UI. No text, no typography, no logo, no borders, no UI. Output a high resolution wide landscape image.
+
+## Uso em celulares e tablets
+
+As adaptações ficam em `frontend/src/responsive.css`, carregado após os estilos principais. Até 700 px, inventário e histórico usam os mesmos registros em apresentação de cartões com rótulos; as ações de consulta e edição permanecem disponíveis. A navegação ocupa quatro colunas, os filtros e formulários ficam em uma coluna e o mapa acompanha a largura da tela. Em telas de até 380 px, indicadores e campos dos cartões também são empilhados.
+
+Botões e campos têm altura mínima de 44 px no celular e em dispositivos de toque. Os campos usam fonte de 16 px; diálogos consideram a altura dinâmica da tela e as áreas seguras do aparelho. O wallpaper tem enquadramento e contraste próprios no Início em telas pequenas. Em paisagem baixa, a navegação deixa de ficar fixa para preservar espaço de conteúdo. Entre 701 e 1100 px, os filtros usam duas colunas.
+
+A publicação inclui a refatoração da branch `refactor/qualidade-codigo`. Os 15 testes funcionais do frontend, Oxlint, Prettier e build passaram nesta alteração. A revisão de CSS considera larguras a partir de 320 px, mas o DOM simulado não mede o layout: a conferência em Safari/Chrome de um aparelho real ainda está pendente.

@@ -7,39 +7,45 @@ type Props = {
 }
 export default function ResourceTable({ rows, category, onOpen }: Props) {
   return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>{category === 'equipment' ? 'Equipamento' : 'Agente'}</th>
-            <th>Situação</th>
-            <th>Localização</th>
-            <th>Órgão</th>
-            <th>Ações</th>
+    <div className="table-wrap responsive-table">
+      <table role="table" aria-label={category === 'equipment' ? 'Equipamentos' : 'Agentes'}>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col">{category === 'equipment' ? 'Equipamento' : 'Agente'}</th>
+            <th scope="col">Situação</th>
+            <th scope="col">Localização</th>
+            <th scope="col">Órgão</th>
+            <th scope="col">Ações</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {rows.map((entry) => (
-            <tr key={entry.id}>
-              <td>
-                <strong>{category === 'equipment' ? entry.serial : entry.name}</strong>
-                <small>
-                  {category === 'equipment'
-                    ? kinds[entry.kind]
-                    : entry.role + ' · ' + entry.registration}
-                </small>
+            <tr key={entry.id} role="row">
+              <td role="cell" data-label={category === 'equipment' ? 'Equipamento' : 'Agente'}>
+                <div>
+                  <strong>{category === 'equipment' ? entry.serial : entry.name}</strong>
+                  <small>
+                    {category === 'equipment'
+                      ? kinds[entry.kind]
+                      : entry.role + ' · ' + entry.registration}
+                  </small>
+                </div>
               </td>
-              <td>
+              <td role="cell" data-label="Situação">
                 <span className={`badge ${entry.status}`}>
                   {(category === 'equipment' ? statuses : agentStatuses)[entry.status]}
                 </span>
               </td>
-              <td>
-                {entry.neighborhood}
-                <small>{entry.region}</small>
+              <td role="cell" data-label="Localização">
+                <div>
+                  {entry.neighborhood}
+                  <small>{entry.region}</small>
+                </div>
               </td>
-              <td>{entry.agency}</td>
-              <td>
+              <td role="cell" data-label="Órgão">
+                <span>{entry.agency}</span>
+              </td>
+              <td role="cell" data-label="Ações">
                 <button className="ghost small" onClick={() => onOpen(entry, category)}>
                   Ver detalhes
                 </button>

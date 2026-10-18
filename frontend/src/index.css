@@ -53,7 +53,7 @@ body:has(.shell.home) {
   color: #a8b0a9;
   font-size: 12px;
 }
-@media (min-width: 901px) {
+@media (min-width: 1101px) and (hover: hover) and (pointer: fine) {
   #root {
     zoom: 0.75;
   }

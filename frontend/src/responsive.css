@@ -1,0 +1,360 @@
+.shell,
+.workspace,
+.panel,
+.filters,
+.form-grid,
+.module-card,
+.metric,
+.risk-card,
+.region {
+  min-width: 0;
+}
+.table-wrap {
+  max-width: 100%;
+}
+.connection::before {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1100px) {
+  .shell {
+    padding-inline: 28px;
+  }
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .filters .search-label {
+    grid-column: 1 / -1;
+  }
+  .filters label {
+    min-width: 0;
+  }
+  .filters > button {
+    align-self: end;
+  }
+  .operation-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (pointer: coarse) {
+  button,
+  input,
+  select {
+    min-height: 44px;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  .city-map.leaflet-touch .leaflet-bar a {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+  }
+}
+
+@media (max-width: 700px) {
+  .shell {
+    width: 100%;
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-bottom: max(64px, env(safe-area-inset-bottom));
+  }
+  body:has(.shell.home) {
+    background:
+      linear-gradient(90deg, rgba(20, 23, 22, 0.75), rgba(20, 23, 22, 0.22)),
+      linear-gradient(180deg, rgba(20, 23, 22, 0.2), #141716 85%),
+      url('./assets/fenix-wallpaper.webp') 65% top / auto 720px no-repeat;
+  }
+  .topbar {
+    gap: 16px;
+    min-height: auto;
+    padding-top: max(22px, env(safe-area-inset-top));
+    padding-bottom: 20px;
+  }
+  .brand {
+    font-size: 25px;
+  }
+  .header-actions {
+    width: 100%;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .connection {
+    font-size: 12px;
+  }
+  .main-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    overflow: visible;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: env(safe-area-inset-top);
+    background: rgba(20, 23, 22, 0.96);
+    backdrop-filter: blur(12px);
+  }
+  .main-nav button {
+    min-width: 0;
+    min-height: 48px;
+    padding: 14px 3px;
+    font-size: 13px;
+  }
+  .main-nav button:focus-visible {
+    outline-offset: -4px;
+  }
+  .home .hero {
+    min-height: 300px;
+    padding: 56px 0 44px;
+  }
+  .home h1 {
+    font-size: clamp(36px, 9.2vw, 58px);
+    line-height: 1.1;
+    margin-block: 20px;
+  }
+  .module-card {
+    padding: 24px 20px;
+  }
+  .module-card p {
+    min-height: 0;
+    margin-bottom: 8px;
+  }
+  .stage {
+    max-width: 100%;
+    line-height: 1.5;
+  }
+  .workspace {
+    padding-top: 28px;
+  }
+  .page-heading,
+  .list-meta,
+  .server-update,
+  .panel-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .page-heading h1 {
+    font-size: clamp(28px, 7vw, 36px);
+    overflow-wrap: anywhere;
+  }
+  .page-heading p {
+    line-height: 1.6;
+  }
+  .page-heading > button,
+  .list-meta > button {
+    width: 100%;
+    white-space: normal;
+  }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .tabs button {
+    padding-inline: 8px;
+    min-width: 0;
+    font-size: 13px;
+  }
+  .tabs span {
+    margin-left: 4px;
+  }
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+  .filters > button {
+    width: 100%;
+  }
+  button,
+  input,
+  select {
+    min-height: 44px;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  label {
+    min-width: 0;
+    font-size: 13px;
+  }
+  textarea {
+    min-height: 120px;
+    max-width: 100%;
+    resize: vertical;
+  }
+  .text-button {
+    margin-left: 0;
+    padding: 10px 12px;
+  }
+  .metrics,
+  .metrics.three {
+    gap: 10px;
+  }
+  .metric span {
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .panel {
+    padding: 16px;
+  }
+  .panel h2 {
+    font-size: 19px;
+    line-height: 1.4;
+  }
+  .city-map {
+    height: clamp(260px, 55svh, 380px);
+    width: 100%;
+  }
+  .alert-item > span,
+  .risk-head > strong,
+  .region,
+  .field-error {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .risk-grid,
+  .regions,
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .risk-card li > :first-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .responsive-table {
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .responsive-table table,
+  .responsive-table tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .responsive-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+  .responsive-table tr {
+    display: block;
+    min-width: 0;
+    border: 1px solid #343b35;
+    border-radius: 9px;
+    background: #1b201c;
+    padding: 8px 14px;
+  }
+  .responsive-table td {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: start;
+    gap: 14px;
+    padding: 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .responsive-table td:first-child {
+    border-top: 0;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    color: #a8b0a9;
+    font-size: 12px;
+  }
+  .responsive-table td > * {
+    min-width: 0;
+  }
+  .responsive-table .badge {
+    justify-self: start;
+    max-width: 100%;
+    white-space: normal;
+  }
+  .responsive-table td:has(button) {
+    display: block;
+  }
+  .responsive-table td:has(button)::before {
+    content: none;
+  }
+  .responsive-table td button {
+    width: 100%;
+    font-size: 14px;
+  }
+  .overlay {
+    height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dialog {
+    min-width: 0;
+    padding: 20px 16px;
+    margin: 0;
+  }
+  .dialog-head {
+    gap: 12px;
+  }
+  .dialog-head h2 {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+  .dialog-head > button {
+    flex-shrink: 0;
+    padding-inline: 10px;
+    font-size: 13px;
+  }
+  .dialog-actions,
+  .button-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    gap: 10px;
+  }
+  .danger-zone {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .danger-zone button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .metrics,
+  .metrics.three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .responsive-table td {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 1000px) {
+  .main-nav {
+    position: static;
+  }
+  .home .hero {
+    min-height: 220px;
+    padding-block: 32px;
+  }
+}

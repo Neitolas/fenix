@@ -457,19 +457,19 @@ export default function App() {
                   Últimos {Math.min(200, data.events.length)} eventos. Ações manuais são
                   identificadas pela origem.
                 </p>
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Momento</th>
-                        <th>Recurso</th>
-                        <th>Evento</th>
-                        <th>Estado informado</th>
-                        <th>Coordenadas informadas</th>
-                        <th>Origem</th>
+                <div className="table-wrap responsive-table">
+                  <table role="table" aria-label="Histórico de eventos">
+                    <thead role="rowgroup">
+                      <tr role="row">
+                        <th scope="col">Momento</th>
+                        <th scope="col">Recurso</th>
+                        <th scope="col">Evento</th>
+                        <th scope="col">Estado informado</th>
+                        <th scope="col">Coordenadas informadas</th>
+                        <th scope="col">Origem</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody role="rowgroup">
                       {data.events
                         .filter(
                           (e) =>
@@ -480,17 +480,29 @@ export default function App() {
                         )
                         .slice(0, 200)
                         .map((e) => (
-                          <tr key={e.id}>
-                            <td>{dateLabel(e.timestamp)}</td>
-                            <td>{e.resource_name || e.equipment || e.agent}</td>
-                            <td>{eventLabels[e.kind]}</td>
-                            <td>{e.status ? statuses[e.status] || e.status : '—'}</td>
-                            <td>
-                              {e.latitude != null && e.longitude != null
-                                ? `${e.latitude}, ${e.longitude}`
-                                : '—'}
+                          <tr key={e.id} role="row">
+                            <td role="cell" data-label="Momento">
+                              <span>{dateLabel(e.timestamp)}</span>
                             </td>
-                            <td>{e.origin}</td>
+                            <td role="cell" data-label="Recurso">
+                              <span>{e.resource_name || e.equipment || e.agent}</span>
+                            </td>
+                            <td role="cell" data-label="Evento">
+                              <span>{eventLabels[e.kind]}</span>
+                            </td>
+                            <td role="cell" data-label="Estado informado">
+                              <span>{e.status ? statuses[e.status] || e.status : '—'}</span>
+                            </td>
+                            <td role="cell" data-label="Coordenadas informadas">
+                              <span>
+                                {e.latitude != null && e.longitude != null
+                                  ? `${e.latitude}, ${e.longitude}`
+                                  : '—'}
+                              </span>
+                            </td>
+                            <td role="cell" data-label="Origem">
+                              <span>{e.origin}</span>
+                            </td>
                           </tr>
                         ))}
                     </tbody>
@@ -542,7 +554,7 @@ export default function App() {
                       {r.factors.length ? (
                         r.factors.map((f) => (
                           <li key={f.label}>
-                            {f.label}
+                            <span>{f.label}</span>
                             <strong>+{f.points}</strong>
                           </li>
                         ))
