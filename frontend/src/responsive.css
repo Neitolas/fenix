@@ -2,22 +2,15 @@
   max-width: 100%;
 }
 .shell.home {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: max(32px, env(safe-area-inset-bottom));
-}
-.shell.home > .topbar,
-.shell.home > .main-nav {
-  flex-shrink: 0;
+  margin-inline: 0;
 }
 .shell.home > .hero {
-  margin-top: auto;
   min-height: 0;
   max-width: 720px;
-  padding-block: 48px 0;
-}
-.shell.home > .hero h1 {
-  margin-bottom: 0;
+  padding-block: 40px 48px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
 }
 .connection::before {
   flex-shrink: 0;
