@@ -12,3 +12,8 @@ dist/
 .vscode/
 
 .venv
+
+.env.*
+!.env.example
+!.env.production.example
+backend/staticfiles/

@@ -461,3 +461,19 @@
     padding-block: 32px;
   }
 }
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-block: 16px;
+  color: #a8b0a9;
+  font-size: 13px;
+}
+.map-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}

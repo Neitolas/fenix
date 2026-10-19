@@ -61,3 +61,30 @@ test('score explains high attention without presenting probability', () => {
   assert.equal(result.level, 'high')
   assert.equal(result.factors.length, 2)
 })
+
+test('demonstration rejects invalid characteristics just like Django', () => {
+  const data = seed()
+  for (const characteristics of [
+    { night_vision: 'sim' },
+    { speed_limit: true },
+    { speed_limit: 201 },
+    { speed_limit: 0 },
+    [],
+    null,
+  ])
+    assert.ok(
+      validateEntry({ ...data.equipment[0], characteristics }, 'equipment', data.equipment)
+        .characteristics,
+    )
+  for (const characteristics of [
+    { night_vision: false },
+    { speed_limit: 1 },
+    { speed_limit: 200 },
+    {},
+  ])
+    assert.equal(
+      validateEntry({ ...data.equipment[0], characteristics }, 'equipment', data.equipment)
+        .characteristics,
+      undefined,
+    )
+})

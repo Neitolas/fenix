@@ -58,3 +58,54 @@ jobs:
           coverage: none
       - run: php -l reports-php/index.php
       - run: php reports-php/tests.php
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r backend/requirements.txt
+      - name: Testar integração Django e PHP por HTTP
+        env:
+          REPORT_SERVICE_TOKEN: ci-only-http-token
+          REPORT_SERVICE_URL: http://127.0.0.1:9080
+          RUN_REPORT_HTTP_TESTS: '1'
+        run: |
+          php -S 127.0.0.1:9080 -t reports-php reports-php/index.php >/tmp/fenix-php.log 2>&1 &
+          PHP_PID=$!
+          trap 'kill "$PHP_PID"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:9080/health; then break; fi
+            sleep 1
+          done
+          python backend/manage.py test operations.test_report_http
+
+  mysql:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci-only-root
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: fenix
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -pci-only-root --silent"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DB_ENGINE: mysql
+      MYSQL_DATABASE: fenix
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ci-only-root
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: '3306'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y pkg-config default-libmysqlclient-dev
+      - run: pip install -r backend/requirements-mysql.txt
+      - run: python backend/manage.py migrate --noinput
+      - run: python backend/manage.py seed_demo
+      - run: python backend/manage.py seed_demo
+      - run: python backend/manage.py test config operations

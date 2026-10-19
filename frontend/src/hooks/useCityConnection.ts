@@ -1,34 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CityData, Risk } from '../types'
-import { seed } from '../domain'
+import { readDemo, demoStorageKey } from '../demoStorage'
 import * as api from '../api'
 
 const initialData: CityData = { equipment: [], agents: [], events: [] }
-const storageKey = 'fenix-demo-v1'
 const refreshIntervalMs = 5000
 export type CityClient = Pick<typeof api, 'session' | 'loadCity' | 'logout'>
 
-function readDemo(): CityData {
-  try {
-    const raw = localStorage.getItem(storageKey)
-    if (raw) {
-      const d = JSON.parse(raw)
-      if (Array.isArray(d.equipment) && Array.isArray(d.agents) && Array.isArray(d.events)) return d
-    }
-  } catch {
-    /* Usa uma nova demonstração se o armazenamento não estiver disponível. */
-  }
-  return seed()
-}
 export function useCityConnection(onServerRecognized: () => void, client: CityClient = api) {
   const [mode, setMode] = useState<'demo' | 'server'>('demo')
-  const [demo, setDemo] = useState<CityData>(readDemo)
+  const [initialDemo] = useState(readDemo)
+  const [demo, setDemo] = useState<CityData>(initialDemo.data)
   const [server, setServer] = useState<CityData>(initialData)
   const [serverRisks, setServerRisks] = useState<Risk[]>([])
   const [serverTrend, setServerTrend] = useState({ recent: 0, previous: 0 })
   const [connected, setConnected] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialDemo.warning)
   const [updated, setUpdated] = useState<string | null>(null)
   const [now, setNow] = useState(() => Date.now())
   const requestSequence = useRef(0)
@@ -47,7 +35,7 @@ export function useCityConnection(onServerRecognized: () => void, client: CityCl
     setNow(Date.now())
     setUpdated(new Date().toISOString())
     try {
-      localStorage.setItem(storageKey, JSON.stringify(next))
+      localStorage.setItem(demoStorageKey, JSON.stringify(next))
     } catch {
       setError('Alterações mantidas nesta sessão, mas o navegador não permitiu salvá-las.')
     }

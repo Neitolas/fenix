@@ -34,7 +34,12 @@ class EquipmentForm(forms.ModelForm):
         return value
 
     def clean_characteristics(self):
-        value = self.cleaned_data.get("characteristics") or {}
+        raw = self.data.get("characteristics")
+        if raw is not None and not isinstance(raw, (str, dict)):
+            raise forms.ValidationError("Informe um objeto de características.")
+        value = self.cleaned_data.get("characteristics")
+        if value is None:
+            value = {}
         if not isinstance(value, dict):
             raise forms.ValidationError("Informe um objeto de características.")
         if "night_vision" in value and not isinstance(value["night_vision"], bool):

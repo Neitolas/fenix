@@ -13,6 +13,8 @@ import userEvent from '@testing-library/user-event'
 import App from './App'
 import * as api from './api'
 import { seed } from './domain'
+import ResourceTable from './components/ResourceTable'
+import { readDemo } from './demoStorage'
 import { useCityConnection } from './hooks/useCityConnection'
 vi.mock('./components/CityMap', () => ({ default: () => <div>Mapa de recursos</div> }))
 beforeEach(() => {
@@ -205,4 +207,54 @@ describe('Fluxos da central', () => {
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).toBeNull()
   })
+})
+
+it('recupera demonstração com registros corrompidos sem quebrar a tela', () => {
+  localStorage.setItem(
+    'fenix-demo-v1',
+    JSON.stringify({ equipment: [null], agents: [], events: [] }),
+  )
+  render(<App />)
+  expect(screen.getByRole('heading', { name: /Uma cidade capaz/ })).toBeTruthy()
+  expect(screen.getByRole('alert').textContent).toMatch(/inválidos/)
+})
+it('pagina tabelas sem perder registros e volta à primeira página após filtrar', async () => {
+  const user = userEvent.setup()
+  const rows = Array.from({ length: 51 }, (_, i) => ({
+    ...seed().equipment[0],
+    id: i + 1,
+    serial: `PAG-${i + 1}`,
+  }))
+  const props = { rows, category: 'equipment' as const, onOpen: vi.fn() }
+  const view = render(<ResourceTable {...props} />)
+  expect(screen.queryByText('PAG-51')).toBeNull()
+  await user.click(screen.getByRole('button', { name: 'Próxima página de equipamentos' }))
+  expect(screen.getByText('PAG-51')).toBeTruthy()
+  view.rerender(<ResourceTable {...props} rows={rows.slice(0, 1)} />)
+  expect(screen.getByText('PAG-1')).toBeTruthy()
+})
+
+it.each([
+  '{bad',
+  JSON.stringify({ equipment: [null], agents: [], events: [] }),
+  JSON.stringify({ ...seed(), events: [null] }),
+  JSON.stringify({ ...seed(), events: [{ ...seed().events[0], timestamp: 'invalid' }] }),
+  JSON.stringify({ ...seed(), equipment: [{ ...seed().equipment[0], latitude: 91 }] }),
+])('recupera armazenamento inválido sem sobrescrever a cópia original: %s', (raw) => {
+  localStorage.setItem('fenix-demo-v1', raw)
+  const recovered = readDemo()
+  expect(recovered.data.equipment).toHaveLength(12)
+  expect(recovered.warning).not.toBe('')
+  expect(localStorage.getItem('fenix-demo-v1')).toBe(raw)
+})
+it('mantém dados válidos e funciona quando o armazenamento é bloqueado', () => {
+  const original = seed()
+  original.equipment[0].serial = 'PRESERVADO'
+  localStorage.setItem('fenix-demo-v1', JSON.stringify(original))
+  expect(readDemo().data.equipment[0].serial).toBe('PRESERVADO')
+  vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    throw new Error('bloqueado')
+  })
+  expect(readDemo().data.equipment).toHaveLength(12)
+  expect(readDemo().warning).not.toBe('')
 })

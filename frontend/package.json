@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/domain.test.ts && vitest run --environment jsdom src/App.ui.test.tsx",
+    "test": "node --experimental-strip-types --test src/domain.test.ts && vitest run --environment jsdom src/App.ui.test.tsx src/components/CityMap.test.tsx",
     "format": "prettier --write src",
     "format:check": "prettier --check src"
   },

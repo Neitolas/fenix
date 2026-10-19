@@ -16,6 +16,8 @@ export default function CityMap({
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const layers = useRef<L.LayerGroup | null>(null)
+  const boundsKey = useRef<string | null>(null)
+  const positions = useRef<L.LatLngExpression[]>([])
   const callback = useRef(onSelect)
   useEffect(() => {
     callback.current = onSelect
@@ -40,12 +42,14 @@ export default function CityMap({
       instance.remove()
       map.current = null
       layers.current = null
+      boundsKey.current = null
     }
   }, [])
   useEffect(() => {
     if (!layers.current) return
     layers.current.clearLayers()
     const points: L.LatLngExpression[] = []
+    const visibleIds: string[] = []
     for (const [list, category] of [
       [equipment, 'equipment'],
       [agents, 'agent'],
@@ -54,6 +58,7 @@ export default function CityMap({
         if (!Number.isFinite(Number(e.latitude)) || !Number.isFinite(Number(e.longitude))) continue
         const p: L.LatLngExpression = [Number(e.latitude), Number(e.longitude)]
         points.push(p)
+        visibleIds.push(`${category}:${e.id}`)
         const color =
           category === 'agent'
             ? '#79b7ef'
@@ -76,15 +81,35 @@ export default function CityMap({
           .addTo(layers.current)
       }
     }
-    if (points.length && map.current)
+    positions.current = points
+    const key = visibleIds.sort().join(',')
+    if (points.length && map.current && key !== boundsKey.current)
       map.current.fitBounds(L.latLngBounds(points), { padding: [35, 35], maxZoom: 14 })
+    boundsKey.current = key
   }, [equipment, agents])
   return (
-    <div
-      className="city-map"
-      ref={container}
-      role="region"
-      aria-label="Mapa dos equipamentos e agentes"
-    />
+    <>
+      <div className="map-actions">
+        <button
+          className="ghost small"
+          disabled={equipment.length + agents.length === 0}
+          onClick={() => {
+            if (positions.current.length)
+              map.current?.fitBounds(L.latLngBounds(positions.current), {
+                padding: [35, 35],
+                maxZoom: 14,
+              })
+          }}
+        >
+          Enquadrar recursos
+        </button>
+      </div>
+      <div
+        className="city-map"
+        ref={container}
+        role="region"
+        aria-label="Mapa dos equipamentos e agentes"
+      />
+    </>
   )
 }

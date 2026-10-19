@@ -44,6 +44,20 @@ class ApiCase(TestCase):
 
 
 class InventoryTests(ApiCase):
+    def test_rejects_invalid_equipment_characteristics(self):
+        for attrs in [
+            {"night_vision": "sim"},
+            {"speed_limit": True},
+            {"speed_limit": 201},
+            [],
+        ]:
+            with self.subTest(attrs=attrs):
+                response = self.post(
+                    "/api/equipment/", self.equipment | {"characteristics": attrs}
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertIn("characteristics", response.json()["errors"])
+
     def test_equipment_crud_and_soft_delete(self):
         item = self.create()
         listing = self.client.get("/api/equipment/?search=CAM-001").json()
@@ -280,7 +294,11 @@ class ReportTests(ApiCase):
         self.assertEqual(len(json.loads(send.call_args.args[0].data)["rows"]), 1)
 
     def test_report_service_unavailable_is_explicit(self):
-        response = self.client.get("/api/reports/equipment.csv")
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(os.environ, {"REPORT_SERVICE_TOKEN": ""}):
+            response = self.client.get("/api/reports/equipment.csv")
         self.assertEqual(response.status_code, 503)
         self.assertIn("relatórios", response.json()["error"])
 

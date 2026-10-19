@@ -39,7 +39,7 @@ Esse endereço não hospeda Django nem PHP. Na execução integrada, entre em `h
 Requisitos: Python 3.12, Node.js 24, npm e PHP 8.3 ou superior. Para MySQL, Docker com Compose v2. Não é preciso contratar um serviço pago para executar localmente.
 
 ```sh
-git clone https://github.com/Neitolas/fenix.git
+git clone --branch refactor/qualidade-codigo https://github.com/Neitolas/fenix.git
 cd fenix
 python -m venv .venv
 ```
@@ -208,3 +208,49 @@ As adaptações ficam em `frontend/src/responsive.css`, carregado após os estil
 Botões e campos têm altura mínima de 44 px no celular e em dispositivos de toque. Os campos usam fonte de 16 px; diálogos consideram a altura dinâmica da tela e as áreas seguras do aparelho. O wallpaper tem enquadramento e contraste próprios no Início em telas pequenas. Em paisagem baixa, a navegação deixa de ficar fixa para preservar espaço de conteúdo. Entre 701 e 1100 px, os filtros usam duas colunas.
 
 A publicação inclui a refatoração da branch `refactor/qualidade-codigo`. Os 15 testes funcionais do frontend, Oxlint, Prettier e build passaram nesta alteração. A revisão de CSS considera larguras a partir de 320 px, mas o DOM simulado não mede o layout: a conferência em Safari/Chrome de um aparelho real ainda está pendente.
+
+
+## Revisão funcional e correções
+
+A leitura da demonstração valida o conteúdo de cada recurso e evento, incluindo tipos, identificadores, coordenadas e datas. Se os dados locais forem inválidos, novos exemplos são carregados com um aviso; a cópia original no navegador só é substituída ao salvar uma alteração. O acesso ao armazenamento bloqueado também é tratado sem interromper a interface.
+
+A demonstração valida os tipos das características, visão noturna booleana, limite de velocidade entre 1 e 200, opções de situação/manutenção, datas e limites de texto. O Django também rejeita listas vazias no campo de características, que deve conter um objeto JSON.
+
+O mapa preserva o enquadramento quando chegam atualizações dos mesmos recursos. Ele se ajusta quando o conjunto de recursos muda; o botão **Enquadrar recursos** permite ajustar a visualização manualmente. O comportamento foi testado com a API Leaflet substituída no teste de componente; a disponibilidade dos mapas e o gesto de zoom em navegador real ainda precisam de conferência.
+
+Tabelas de equipamentos e agentes mostram até 50 registros por página, com contagem e controles acessíveis. Alterar o conjunto filtrado retorna à primeira página. Os indicadores continuam considerando todos os resultados filtrados. A paginação é de apresentação: a central ainda carrega até 5.000 registros de cada categoria pela API, e o histórico permanece limitado aos 200 eventos mais recentes. Uma base maior exige consultas e filtros no servidor, sem carregar todo o inventário a cada ciclo.
+
+Validação desta revisão: 28 testes Django com os relatórios por HTTP habilitados, 25 testes do frontend (oito de domínio e 17 de interface/componentes) e oito verificações PHP. Foram verificados CSV filtrado, rejeições 400/401 do PHP, saúde 200 do Gunicorn, redirecionamento HTTPS 301, HSTS e cookie CSRF com `Secure`. A execução PHP local usa PHP.wasm. O CI inclui integração HTTP com PHP 8.3 nativo e um job MySQL 8.4 com migrações, carga demonstrativa repetida e testes. A configuração desses jobs não significa que a execução já tenha sido aprovada; acompanhe os resultados no GitHub Actions. Docker/MySQL não estão disponíveis neste ambiente, e não houve validação visual em navegador real.
+
+Com o PHP iniciado, para executar os testes HTTP no Linux/macOS:
+
+```sh
+RUN_REPORT_HTTP_TESTS=1 python backend/manage.py test config operations
+```
+
+O token e a URL configurados no Django devem corresponder ao serviço PHP. Sem `RUN_REPORT_HTTP_TESTS=1`, os dois testes que dependem desse serviço são explicitamente ignorados.
+
+## Configuração para produção
+
+`config.settings_production` mantém a configuração local separada e exige uma chave Django aleatória de pelo menos 50 caracteres, token de relatórios com pelo menos 32 e uma lista explícita de hosts, sem curinga. O perfil desativa DEBUG, exige HTTPS e usa cookies seguros. O exemplo `.env.production.example` contém campos vazios para os segredos; preencha uma cópia `.env.production`, que está ignorada pelo Git. Não copie as credenciais locais para produção.
+
+Em Linux, depois de preparar banco, serviço PHP e um proxy HTTPS que sirva a interface e encaminhe `/api` e `/admin` à API na mesma origem:
+
+```sh
+python -m pip install -r backend/requirements-production.txt
+set -a
+. ./.env.production
+set +a
+python backend/manage.py check --deploy
+python backend/manage.py migrate
+python backend/manage.py collectstatic --noinput
+python -m gunicorn --chdir backend config.wsgi:application --bind 127.0.0.1:8000 --workers 2 --no-control-socket
+```
+
+As dependências MySQL podem exigir compilador, `pkg-config` e cabeçalhos do cliente MySQL; o Dockerfile já instala esses pacotes. A imagem da API usa Gunicorn e usuário sem privilégios por padrão. O Compose existente continua sendo uma alternativa de desenvolvimento e seleciona explicitamente `config.settings` com `runserver`.
+
+Configure o proxy para servir `backend/staticfiles` em `/static/`. `DJANGO_TRUST_PROXY_SSL_HEADER` começa desativado: só o habilite se o proxy remover o cabeçalho enviado pelo cliente e definir `X-Forwarded-Proto` corretamente. Sem isso, o redirecionamento HTTPS pode entrar em ciclo atrás do proxy.
+
+HSTS começa com 3.600 segundos. Inclusão de subdomínios e preload são decisões explícitas: ficam desativados no exemplo e geram os avisos W005/W021 de implantação. Só ative ambos após garantir HTTPS em todos os subdomínios; preload também exige `DJANGO_HSTS_SECONDS` de pelo menos 31536000. Os testes verificam o perfil completo com essas opções habilitadas, além da rejeição de credenciais inadequadas. Nenhum aviso de segurança foi silenciado no projeto.
+
+Essa preparação não implanta Django/PHP no site estático do ChatGPT. O serviço PHP do Compose usa o servidor CLI para desenvolvimento; uma implantação pública completa ainda requer hospedagem adequada do PHP, TLS, backup e validação da infraestrutura real. Referência: [checklist oficial do Django 5.2](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/).

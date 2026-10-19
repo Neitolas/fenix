@@ -1,4 +1,4 @@
-import { emptyEntry } from './types.ts'
+import { emptyEntry, kinds, statuses, agentStatuses, maintenanceLabels } from './types.ts'
 import type { CityData, CityEvent, Entry, Filters, Risk, Category } from './types.ts'
 
 export function localDay(date = new Date()): string {
@@ -211,6 +211,55 @@ export function validateEntry(
     const v = draft[key]
     if (v === '' || v === null || !Number.isFinite(Number(v)) || Math.abs(Number(v)) > max)
       errors[key] = 'Informe uma coordenada válida.'
+  }
+  const attrs = draft.characteristics
+  if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) {
+    errors.characteristics = 'Informe um objeto de características.'
+  } else {
+    const values = attrs as Record<string, unknown>
+    if ('night_vision' in values && typeof values.night_vision !== 'boolean')
+      errors.characteristics = 'Visão noturna deve ser verdadeiro ou falso.'
+    if (
+      'speed_limit' in values &&
+      (typeof values.speed_limit !== 'number' ||
+        !Number.isFinite(values.speed_limit) ||
+        values.speed_limit < 1 ||
+        values.speed_limit > 200)
+    )
+      errors.characteristics = 'Limite de velocidade deve estar entre 1 e 200 km/h.'
+  }
+  if (!Object.hasOwn(category === 'equipment' ? statuses : agentStatuses, String(draft.status)))
+    errors.status = 'Informe uma situação válida.'
+  const lengths: Record<string, number> = {
+    agency: 100,
+    neighborhood: 100,
+    region: 100,
+    serial: 80,
+    brand: 80,
+    model: 80,
+    city: 100,
+    street: 150,
+    reference: 150,
+    name: 100,
+    registration: 50,
+    role: 80,
+  }
+  for (const key of fields) {
+    if (lengths[key] && String(draft[key]).length > lengths[key])
+      errors[key] = `Use até ${lengths[key]} caracteres.`
+  }
+  if (category === 'equipment') {
+    if (!Object.hasOwn(kinds, String(draft.kind))) errors.kind = 'Informe um tipo válido.'
+    if (!Object.hasOwn(maintenanceLabels, String(draft.maintenance)))
+      errors.maintenance = 'Informe uma manutenção válida.'
+    if (
+      draft.next_maintenance &&
+      (!/^\d{4}-\d{2}-\d{2}$/.test(String(draft.next_maintenance)) ||
+        !Number.isFinite(Date.parse(String(draft.next_maintenance))) ||
+        new Date(String(draft.next_maintenance)).toISOString().slice(0, 10) !==
+          draft.next_maintenance)
+    )
+      errors.next_maintenance = 'Informe uma data válida.'
   }
   if (category === 'equipment') {
     if (!/^\d{5}-?\d{3}$/.test(String(draft.postal_code)))
