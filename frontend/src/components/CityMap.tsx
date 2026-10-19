@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Entry, Category } from '../types'
@@ -13,6 +13,7 @@ export default function CityMap({
   agents: Entry[]
   onSelect: (e: Entry, c: Category) => void
 }) {
+  const [mapWarning, setMapWarning] = useState('')
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const layers = useRef<L.LayerGroup | null>(null)
@@ -26,18 +27,22 @@ export default function CityMap({
     if (!container.current) return
     const instance = L.map(container.current).setView([-22.21, -49.94], 13)
     map.current = instance
-    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     }).addTo(instance)
     layers.current = L.layerGroup().addTo(instance)
-    tiles.on('tileerror', () =>
-      container.current?.setAttribute(
-        'data-map-warning',
-        'Sem acesso aos mapas externos. Use a lista de recursos.',
-      ),
-    )
+    let failed = false
+    tiles.on('tileerror', () => {
+      if (!failed && map.current === instance) {
+        failed = true
+        instance.removeLayer(tiles)
+        setMapWarning(
+          'Mapa base indisponível. Os pontos continuam consultáveis; a lista de recursos permanece disponível abaixo.',
+        )
+      }
+    })
     return () => {
       instance.remove()
       map.current = null
@@ -89,6 +94,11 @@ export default function CityMap({
   }, [equipment, agents])
   return (
     <>
+      {mapWarning && (
+        <p className="notice map-warning" role="status">
+          {mapWarning}
+        </p>
+      )}
       <div className="map-actions">
         <button
           className="ghost small"

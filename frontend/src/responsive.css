@@ -477,3 +477,27 @@
   justify-content: flex-end;
   margin-bottom: 12px;
 }
+
+:root {
+  color-scheme: dark;
+}
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #141915;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23a8b0a9' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.main-nav button {
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.main-nav button:not(.active) {
+  border-bottom-color: transparent;
+}
+.map-warning {
+  margin-top: 0;
+}

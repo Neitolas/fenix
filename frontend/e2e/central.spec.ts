@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 
+test.beforeEach(async ({ page }) => {
+  await page.route(/https:\/\/(?:[^/]+\.)?tile\.openstreetmap\.org\//, (route) =>
+    route.abort('internetdisconnected'),
+  )
+})
+
 async function assertLayout(page: Page) {
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
@@ -38,12 +44,14 @@ test('demonstração: navegação, cadastro, persistência e layout', async ({ p
     await page.getByRole('button', { name: tab, exact: true }).click()
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
     await assertLayout(page)
+    await expect(page.locator('select').first()).toHaveCSS('appearance', 'none')
     await page.screenshot({
       path: testInfo.outputPath(`${tab}.png`),
       fullPage: false,
       scale: 'css',
     })
     if (tab === 'Operação') {
+      await expect(page.getByText(/Mapa base indisponível/)).toBeVisible()
       await page
         .locator('.map-panel')
         .screenshot({ path: testInfo.outputPath('mapa.png'), scale: 'css' })

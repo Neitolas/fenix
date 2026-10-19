@@ -1,13 +1,20 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import CityMap from './CityMap'
 import { seed } from '../domain'
-const { fitBounds } = vi.hoisted(() => ({ fitBounds: vi.fn() }))
+const { fitBounds, removeLayer, tileFailure } = vi.hoisted(() => ({
+  fitBounds: vi.fn(),
+  removeLayer: vi.fn(),
+  tileFailure: { handler: undefined as undefined | (() => void) },
+}))
 vi.mock('leaflet', () => {
   const chain = () => {
     const value = {
       addTo: vi.fn(() => value),
-      on: vi.fn(() => value),
+      on: vi.fn((event: string, handler: () => void) => {
+        if (event === 'tileerror') tileFailure.handler = handler
+        return value
+      }),
       bindTooltip: vi.fn(() => value),
       clearLayers: vi.fn(),
     }
@@ -21,6 +28,7 @@ vi.mock('leaflet', () => {
         },
         fitBounds,
         remove: vi.fn(),
+        removeLayer,
       }),
       tileLayer: chain,
       layerGroup: chain,
@@ -50,4 +58,13 @@ it('preserva o enquadramento em atualizações e permite reenquadrar manualmente
   expect(fitBounds).toHaveBeenCalledTimes(2)
   view.rerender(<CityMap {...props} equipment={data.equipment.slice(0, 1)} />)
   expect(fitBounds).toHaveBeenCalledTimes(3)
+})
+
+it('remove o fundo que falhou e mantém os recursos consultáveis', () => {
+  const data = seed()
+  render(<CityMap equipment={data.equipment} agents={data.agents} onSelect={vi.fn()} />)
+  act(() => tileFailure.handler?.())
+  expect(screen.getByRole('status').textContent).toMatch(/Mapa base indisponível/)
+  expect(removeLayer).toHaveBeenCalledTimes(1)
+  expect(screen.getByRole('button', { name: 'Enquadrar recursos' })).toBeTruthy()
 })
