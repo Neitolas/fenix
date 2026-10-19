@@ -1,36 +1,43 @@
 services:
   api:
-    profiles: [mysql]
+    profiles:
+    - mysql
     build: ./backend
-    command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+    command:
+    - sh
+    - -c
+    - python manage.py migrate && python manage.py runserver 0.0.0.0:8000
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
-      DJANGO_DEBUG: "true"
+      DJANGO_DEBUG: 'true'
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Configure DJANGO_SECRET_KEY}
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
       REPORT_SERVICE_URL: http://reports:9080
       REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
       DB_ENGINE: mysql
       MYSQL_HOST: db
-      MYSQL_PORT: "3306"
+      MYSQL_PORT: '3306'
       MYSQL_DATABASE: ${MYSQL_DATABASE:?Configure MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER:?Configure MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Configure MYSQL_PASSWORD}
     ports:
-      - "127.0.0.1:8000:8000"
+    - 127.0.0.1:8000:8000
     depends_on:
       reports:
         condition: service_started
       db:
         condition: service_healthy
   reports:
-    profiles: [mysql]
+    profiles:
+    - mysql
     build: ./reports-php
     environment:
       REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
-    expose: ["9080"]
+    expose:
+    - '9080'
   db:
-    profiles: [mysql]
+    profiles:
+    - mysql
     image: mysql:8.4
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?Copie .env.example para .env}
@@ -38,14 +45,16 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Configure MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configure MYSQL_ROOT_PASSWORD}
     ports:
-      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
+    - 127.0.0.1:${MYSQL_PORT:-3306}:3306
     volumes:
-      - fenix_mysql:/var/lib/mysql
+    - fenix_mysql:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      test:
+      - CMD-SHELL
+      - mysql --protocol=TCP -h 127.0.0.1 -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"
+        -e "SELECT 1"
       interval: 5s
       timeout: 5s
       retries: 30
-
 volumes:
-  fenix_mysql:
+  fenix_mysql: null
