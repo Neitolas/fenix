@@ -1,8 +1,8 @@
 # F.E.N.I.X.
 
-**Uma cidade capaz de recomeçar.**
+Uma cidade capaz de recomeçar.
 
-Projeto para a etapa bônus do **DSIN Coder Challenge 2026**, inspirado na iniciativa F.O.G.O. e no universo de PROMETHEUS. A proposta é reunir os recursos da cidade em uma única visão: conhecer o que está disponível, acompanhar a operação e identificar situações que exigem atenção antecipada.
+Projeto para a etapa bônus do DSIN Coder Challenge 2026, inspirado na iniciativa F.O.G.O. e no universo de PROMETHEUS. A proposta é reunir os recursos da cidade em uma única visão conhecer o que está disponível, acompanhar a operação e identificar situações que exigem atenção antecipada.
 
 ## O que o projeto faz
 
@@ -12,24 +12,24 @@ Projeto para a etapa bônus do **DSIN Coder Challenge 2026**, inspirado na inici
 | Operação | Localizar recursos no mapa, aplicar filtros, acompanhar indicadores e alertas e consultar o histórico de eventos. |
 | Prevenção | Consultar um índice de atenção, entender os fatores da pontuação e comparar falhas recentes com o período anterior. |
 
-A solução também oferece relatórios CSV na execução integrada, autenticação e interface adaptada a celulares. Os exemplos são fictícios e compartilhados entre os três módulos: câmeras Sentinela 360, radares Via Segura 60, viaturas Patrulha Urbana e agentes como Ana Martins e Bruno Lima.
+A solução também oferece relatórios CSV na execução integrada, autenticação e interface adaptada a celulares. Os exemplos são fictícios e compartilhados entre os três módulos câmeras Sentinela 360, radares Via Segura 60, viaturas Patrulha Urbana e agentes como Ana Martins e Bruno Lima.
 
 ## Como a solução foi pensada
 
-F.E.N.I.X. representa **Força, Evolução do Nutrir, Integração e X (Incógnita/Potencial)**. O nome remete ao renascimento: reconstruir, recuperar o funcionamento e aprender com as falhas. “Nutrir” significa alimentar decisões com informações confiáveis.
+F.E.N.I.X. representa Força, Evolução do Nutrir, Integração e X (IncógnitaPotencial). O nome remete ao renascimento reconstruir, recuperar o funcionamento e aprender com as falhas. “Nutrir” significa alimentar decisões com informações confiáveis.
 
 React e TypeScript cuidam da interface. Django centraliza os cadastros, o histórico e as regras. PHP gera relatórios CSV sem acessar diretamente o banco. A execução completa utiliza MySQL; o desenvolvimento local também pode usar SQLite.
 
-A prevenção usa regras explicáveis de manutenção e histórico. O índice vai de 0 a 100 e **não representa uma probabilidade estatística de falha**. A tela apresenta os motivos da pontuação e recomendações para apoiar a decisão.
+A prevenção usa regras explicáveis de manutenção e histórico. O índice vai de 0 a 100 e não representa uma probabilidade estatística de falha. A tela apresenta os motivos da pontuação e recomendações para apoiar a decisão.
 
 ## Conjunto completo com HTTPS
 
-Este é o caminho recomendado para avaliar todos os recursos, incluindo banco de dados, autenticação e relatórios. Tenha **Git, Python 3.12, Docker com Compose e OpenSSL** disponíveis. No Windows, mantenha o Docker Desktop iniciado.
+Este é o caminho recomendado para avaliar todos os recursos, incluindo banco de dados, autenticação e relatórios. Tenha Git, Python 3.12, Docker com Compose e OpenSSL disponíveis. No Windows, mantenha o Docker Desktop iniciado.
 
 ### 1. Baixe o projeto
 
 ```sh
-git clone --branch refactor/qualidade-codigo https://github.com/Neitolas/fenix.git
+git clone --branch refactorqualidade-codigo httpsgithub.comNeitolasfenix.git
 cd fenix
 ```
 
@@ -37,32 +37,32 @@ cd fenix
 
 Copie o arquivo de exemplo para criar sua configuração local.
 
-No Windows PowerShell:
+No Windows PowerShell
 
 ```powershell
 Copy-Item .env.full.example .env.full
 ```
 
-No Linux ou macOS:
+No Linux ou macOS
 
 ```sh
 cp .env.full.example .env.full
 ```
 
-Abra `.env.full` em um editor. Preencha os quatro campos de segredo: `DJANGO_SECRET_KEY`, `REPORT_SERVICE_TOKEN`, `MYSQL_PASSWORD` e `MYSQL_ROOT_PASSWORD`. Gere um valor diferente para cada campo executando este comando quatro vezes:
+Abra `.env.full` em um editor. Preencha os quatro campos de segredo `DJANGO_SECRET_KEY`, `REPORT_SERVICE_TOKEN`, `MYSQL_PASSWORD` e `MYSQL_ROOT_PASSWORD`. Gere um valor diferente para cada campo executando este comando quatro vezes
 
 ```sh
-python -c "import secrets; print(secrets.token_urlsafe(64))"
+python -c import secrets; print(secrets.token_urlsafe(64))
 ```
 
 Mantenha os hosts locais informados no exemplo. Não compartilhe esse arquivo nem suas senhas.
 
 ### 3. Inicie a aplicação
 
-Execute na pasta principal do projeto:
+Execute na pasta principal do projeto
 
 ```sh
-python scripts/create_local_tls.py
+python scriptscreate_local_tls.py
 docker compose --env-file .env.full -f compose.full.yaml up --build --detach --wait
 docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py seed_demo
 docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py createsuperuser
@@ -72,7 +72,7 @@ A primeira inicialização pode demorar enquanto o Docker baixa e constrói os s
 
 ### 4. Abra e entre no sistema
 
-Abra [a administração local](https://localhost:8443/admin/) e entre com o usuário criado. Depois, acesse [a aplicação](https://localhost:8443/) ou recarregue a página para que ela reconheça a sessão.
+Abra [a administração local](httpslocalhost8443admin) e entre com o usuário criado. Depois, acesse [a aplicação](httpslocalhost8443) ou recarregue a página para que ela reconheça a sessão.
 
 O certificado é autoassinado e exclusivo para teste local; o navegador exibirá um aviso. Use `localhost` nos dois endereços para manter a mesma sessão.
 
@@ -86,25 +86,34 @@ Os dados permanecem no banco para a próxima execução. Não acrescente `-v` se
 
 ## Roteiro rápido de avaliação
 
-1. No **Inventário**, consulte os exemplos, filtre por bairro e cadastre um equipamento. Edite sua situação e confira os dados nos detalhes.
-2. Na **Operação**, localize o recurso no mapa e registre uma falha. Observe a mudança de situação, o alerta e o histórico. Na conexão com o servidor, os dados são atualizados a cada cinco segundos.
-3. Na **Prevenção**, consulte a pontuação, os fatores e as recomendações. Registre uma manutenção concluída e acompanhe a mudança.
-4. Exporte um **CSV** para conferir o relatório dos recursos filtrados. Essa função exige a execução integrada e uma sessão autenticada.
+1. No Inventário, consulte os exemplos, filtre por bairro e cadastre um equipamento. Edite sua situação e confira os dados nos detalhes.
+
+2. Na Operação, localize o recurso no mapa e registre uma falha. Observe a mudança de situação, o alerta e o histórico. Na conexão com o servidor, os dados são atualizados a cada cinco segundos.
+
+3. Na Prevenção, consulte a pontuação, os fatores e as recomendações. Registre uma manutenção concluída e acompanhe a mudança.
+
+4. Exporte um CSV para conferir o relatório dos recursos filtrados. Essa função exige a execução integrada e uma sessão autenticada.
 
 ## Qualidade e validação
 
 O código separa interface, validação e regras por responsabilidade, reutiliza componentes e evita duplicação desnecessária. As operações de cadastro incluem validação, autenticação e proteção CSRF. A exclusão é lógica, preservando o histórico, e o recebimento de eventos evita duplicações.
 
-Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django com integração HTTP habilitada, oito verificações PHP e oito cenários de navegador. O conjunto completo com HTTPS foi validado em Chromium e WebKit, com tamanhos de tela de desktop e celular, incluindo 320 px. Os [resultados da validação](https://github.com/Neitolas/fenix/actions/runs/39189329717) estão disponíveis no GitHub Actions.
+Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django com integração HTTP habilitada, oito verificações PHP e oito cenários de navegador. O conjunto completo com HTTPS foi validado em Chromium e WebKit, com tamanhos de tela de desktop e celular, incluindo 320 px. Os [resultados da validação](httpsgithub.comNeitolasfenixactionsruns39189329717) estão disponíveis no GitHub Actions.
 
 ## Limitações conhecidas
 
 - O mapa depende de um provedor externo. Se o fundo não carregar, a aplicação informa a falha e mantém os pontos e as listas disponíveis.
+
 - A análise preventiva usa exemplos fictícios e regras explícitas; não é um modelo de aprendizado de máquina nem uma previsão de criminalidade ou tráfego.
+
 - O histórico apresenta os 200 eventos mais recentes. O inventário é carregado na memória do navegador; bases maiores exigem evolução dos filtros e indicadores no servidor.
+
 - Os testes de celular utilizam emulação. A conferência em aparelhos físicos permanece pendente.
+
 - A execução Docker está configurada para acesso local. Uma implantação pública exige servidor, domínio, certificado válido e política de backup.
 
 ## Participação de inteligência artificial
 
-ChatGPT/Codex contribuiu para a interpretação dos requisitos, planejamento, configuração do ambiente, implementação de código, estilos, testes e documentação. O participante definiu o nome F.E.N.I.X. e seu significado e direcionou a proposta e os ajustes do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
+ChatGPTCodex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente.
+
+O nome F.E.N.I.X., implementação de código, estilos, testes, documentação e seu significado foram propostosfeitos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
