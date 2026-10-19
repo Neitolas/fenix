@@ -91,12 +91,6 @@ Os dados permanecem no banco para a próxima execução. Não acrescente `-v` se
 3. Na **Prevenção**, consulte a pontuação, os fatores e as recomendações. Registre uma manutenção concluída e acompanhe a mudança.
 4. Exporte um **CSV** para conferir o relatório dos recursos filtrados. Essa função exige a execução integrada e uma sessão autenticada.
 
-## Demonstração da interface
-
-A [visualização no ChatGPT](https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site) tem acesso restrito ao proprietário. Para avaliadores externos, utilize as instruções de execução acima.
-
-A demonstração usa exemplos salvos apenas no navegador. Permite experimentar cadastros, filtros e eventos, mas não hospeda Django, PHP ou MySQL e não oferece exportação CSV. Alterações nesse modo não são enviadas ao servidor.
-
 ## Qualidade e validação
 
 O código separa interface, validação e regras por responsabilidade, reutiliza componentes e evita duplicação desnecessária. As operações de cadastro incluem validação, autenticação e proteção CSRF. A exclusão é lógica, preservando o histórico, e o recebimento de eventos evita duplicações.
@@ -113,6 +107,4 @@ Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django
 
 ## Participação de inteligência artificial
 
-O desenvolvimento contou com apoio do **ChatGPT/Codex** na interpretação dos requisitos, planejamento, configuração do ambiente, implementação e refatoração de código, ajustes de interface, testes e documentação. A arte de fundo foi adaptada com geração de imagens a partir de uma referência enviada pelo participante.
-
-O participante propôs o nome F.E.N.I.X. e seu significado, direcionou a proposta e solicitou os ajustes funcionais e visuais. A contribuição da IA incluiu implementação, além do apoio ao raciocínio. A aplicação não utiliza uma API de IA durante sua execução.
+ChatGPT/Codex contribuiu para a interpretação dos requisitos, planejamento, configuração do ambiente, implementação de código, estilos, testes e documentação. O participante definiu o nome F.E.N.I.X. e seu significado e direcionou a proposta e os ajustes do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
