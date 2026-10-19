@@ -1,0 +1,6 @@
+FROM php:8.3-fpm-alpine
+WORKDIR /app
+COPY csv.php index.php ./
+RUN printf '[www]\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zz-fenix.conf
+EXPOSE 9000
+CMD ["php-fpm", "-F"]

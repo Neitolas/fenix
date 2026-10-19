@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.sqlite3
+**/dist
+.env*
+infra/tls
+**/test-results
+**/playwright-report

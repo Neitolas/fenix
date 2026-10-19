@@ -55,10 +55,14 @@ export async function logout() {
 export const route = (category: Category) => (category === 'equipment' ? 'equipment/' : 'agents/')
 export async function listAll(category: Category): Promise<Entry[]> {
   const result: Entry[] = []
-  for (let page = 1; page <= 25; page++) {
+  for (let page = 1; ; page++) {
     const data = await request<{ count: number; results: Partial<Entry>[] }>(
       route(category) + `?limit=200&page=${page}`,
     )
+    if (!Number.isSafeInteger(data.count) || data.count < 0 || !Array.isArray(data.results))
+      throw new ApiError('Resposta inválida durante a leitura do inventário.')
+    if (!data.results.length && result.length < data.count)
+      throw new ApiError('O inventário mudou durante a leitura. Atualize a central novamente.')
     result.push(
       ...data.results.map((e) => ({
         ...emptyEntry,
@@ -68,7 +72,6 @@ export async function listAll(category: Category): Promise<Entry[]> {
     )
     if (result.length >= data.count) return result
   }
-  throw new ApiError('Mais de 5.000 recursos. Restrinja o inventário antes de carregar a central.')
 }
 export async function loadCity() {
   const [equipment, agents, events, risks] = await Promise.all([

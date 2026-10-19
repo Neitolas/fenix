@@ -1,0 +1,73 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: fenix
+      MYSQL_USER: fenix
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Configure MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configure MYSQL_ROOT_PASSWORD}
+    volumes:
+      - full_mysql:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'mysqladmin ping -h localhost -uroot -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  reports:
+    build:
+      context: ./reports-php
+      dockerfile: Dockerfile.production
+    environment:
+      REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
+    expose: ['9000']
+  api:
+    build: ./backend
+    command: [sh, -c, 'python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --no-control-socket']
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings_production
+      DJANGO_DEBUG: 'false'
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Configure DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_TRUST_PROXY_SSL_HEADER: 'true'
+      DB_ENGINE: mysql
+      MYSQL_DATABASE: fenix
+      MYSQL_USER: fenix
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Configure MYSQL_PASSWORD}
+      MYSQL_HOST: db
+      REPORT_SERVICE_TOKEN: ${REPORT_SERVICE_TOKEN:?Configure REPORT_SERVICE_TOKEN}
+      REPORT_SERVICE_URL: http://web:9080
+    volumes:
+      - full_static:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      reports:
+        condition: service_started
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/api/health/", headers={"X-Forwarded-Proto":"https"}), timeout=3)']
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  web:
+    build:
+      context: .
+      dockerfile: infra/web.Dockerfile
+    ports:
+      - '127.0.0.1:8080:8080'
+      - '127.0.0.1:8443:8443'
+    volumes:
+      - ./infra/tls:/etc/nginx/tls:ro
+      - full_static:/srv/static:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      reports:
+        condition: service_started
+    healthcheck:
+      test: [CMD-SHELL, 'wget --no-check-certificate -q -O /dev/null https://127.0.0.1:8443/api/health/']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  full_mysql:
+  full_static:

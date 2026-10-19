@@ -358,3 +358,41 @@ class EventValidationTests(SimpleTestCase):
             parse_event(
                 event | {"timestamp": (now + timedelta(minutes=6)).isoformat()}, now=now
             )
+
+
+class DemoCatalogTests(TestCase):
+    def test_seed_uses_coherent_names_without_overwriting_custom_entries(self):
+        from django.core.management import call_command
+
+        from operations.models import Agent, Equipment, Event
+
+        call_command("seed_demo", verbosity=0)
+        item = Equipment.objects.get(serial="CAM-CENTRO-001")
+        self.assertEqual(item.model, "Sentinela 360 — Praça Central")
+        self.assertTrue(Agent.objects.filter(name="Ana Martins").exists())
+        item.model = "Modelo personalizado"
+        item.save()
+        count = Event.objects.count()
+        call_command("seed_demo", verbosity=0)
+        item.refresh_from_db()
+        self.assertEqual(item.model, "Modelo personalizado")
+        self.assertEqual(Equipment.objects.count(), 12)
+        self.assertEqual(Event.objects.count(), count)
+
+    def test_seed_upgrades_legacy_examples_preserving_ids_and_history(self):
+        from django.core.management import call_command
+
+        from operations.models import Equipment
+
+        call_command("seed_demo", verbosity=0)
+        item = Equipment.objects.get(serial="CAM-CENTRO-001")
+        original_id = item.pk
+        item.serial = "DEMO-001"
+        item.brand = "Demonstração"
+        item.model = "Modelo 1"
+        item.save()
+        call_command("seed_demo", verbosity=0)
+        item.refresh_from_db()
+        self.assertEqual(item.serial, "CAM-CENTRO-001")
+        self.assertEqual(item.pk, original_id)
+        self.assertEqual(Equipment.objects.count(), 12)

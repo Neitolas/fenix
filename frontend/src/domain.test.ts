@@ -21,7 +21,7 @@ test('empty inventory has no fabricated availability', () =>
 test('filters operate on the same equipment list used by indicators', () => {
   const data = seed()
   const list = filterEntries(data.equipment, {
-    search: 'DEMO-001',
+    search: 'CAM-CENTRO-001',
     status: '',
     kind: '',
     region: '',
@@ -87,4 +87,16 @@ test('demonstration rejects invalid characteristics just like Django', () => {
         .characteristics,
       undefined,
     )
+})
+
+test('examples use meaningful urban mobility identities', () => {
+  const data = seed()
+  assert.equal(data.equipment[0].serial, 'CAM-CENTRO-001')
+  assert.equal(data.equipment[0].model, 'Sentinela 360 — Praça Central')
+  assert.equal(data.agents[0].name, 'Ana Martins')
+  assert.ok(
+    data.events.every((e) =>
+      data.equipment.some((item) => item.id === e.equipment && item.serial === e.resource_name),
+    ),
+  )
 })

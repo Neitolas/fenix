@@ -1,3 +1,4 @@
+import catalog from '../../backend/operations/demo_catalog.json' with { type: 'json' }
 import { seed, validateEntry } from './domain'
 import { emptyEntry } from './types'
 import type { Category, CityData, Entry } from './types'
@@ -70,12 +71,43 @@ export function validDemo(value: unknown): value is CityData {
     return (event.latitude == null) === (event.longitude == null)
   })
 }
+function upgradeExamples(data: CityData): CityData {
+  const names = new Map<number, string>()
+  const equipment = data.equipment.map((entry) => {
+    const index = Number(/^DEMO-(\d{3})$/.exec(entry.serial)?.[1]) - 1
+    const example = catalog.equipment[index]
+    if (!example || entry.brand !== 'Demonstração' || entry.model !== `Modelo ${index + 1}`)
+      return entry
+    names.set(entry.id, example.serial)
+    return {
+      ...entry,
+      serial: example.serial,
+      brand: example.brand,
+      model: example.model,
+      street: entry.street === 'Via demonstrativa' ? example.street : entry.street,
+      reference: entry.reference === 'Local fictício' ? example.reference : entry.reference,
+    }
+  })
+  const agents = data.agents.map((entry) => {
+    const index = Number(/^DEMO-A(\d+)$/.exec(entry.registration)?.[1]) - 1
+    const example = catalog.agents[index]
+    return example && entry.name === `Agente demonstrativo ${index + 1}`
+      ? { ...entry, name: example.name, registration: example.registration }
+      : entry
+  })
+  const events = data.events.map((event) =>
+    event.equipment && names.has(event.equipment) && /^DEMO-\d{3}$/.test(event.resource_name || '')
+      ? { ...event, resource_name: names.get(event.equipment) }
+      : event,
+  )
+  return { equipment, agents, events }
+}
 export function readDemo(): { data: CityData; warning: string } {
   try {
     const raw = localStorage.getItem(demoStorageKey)
     if (raw !== null) {
       const parsed: unknown = JSON.parse(raw)
-      if (validDemo(parsed)) return { data: parsed, warning: '' }
+      if (validDemo(parsed)) return { data: upgradeExamples(parsed), warning: '' }
       return {
         data: seed(),
         warning:

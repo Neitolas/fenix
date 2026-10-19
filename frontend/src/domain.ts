@@ -1,3 +1,4 @@
+import catalog from '../../backend/operations/demo_catalog.json' with { type: 'json' }
 import { emptyEntry, kinds, statuses, agentStatuses, maintenanceLabels } from './types.ts'
 import type { CityData, CityEvent, Entry, Filters, Risk, Category } from './types.ts'
 
@@ -15,18 +16,7 @@ export function seed(): CityData {
   const equipment = Array.from({ length: 12 }, (_, i) => ({
     ...emptyEntry,
     id: i + 1,
-    serial: `DEMO-${String(i + 1).padStart(3, '0')}`,
-    kind: ['camera', 'radar', 'patrol', 'terminal'][i % 4],
-    brand: 'Demonstração',
-    model: `Modelo ${i + 1}`,
-    agency: ['Trânsito', 'Guarda Municipal'][i % 2],
-    neighborhood: ['Centro', 'Fragata', 'Palmital'][i % 3],
-    region: ['Central', 'Sul', 'Norte'][i % 3],
-    postal_code: '17500000',
-    street: 'Via demonstrativa',
-    reference: 'Local fictício',
-    latitude: -22.21 + (i % 4) * 0.007,
-    longitude: -49.95 + Math.floor(i / 4) * 0.009,
+    ...catalog.equipment[i],
     status: ['operational', 'operational', 'fault', 'maintenance', 'not_installed', 'disabled'][
       i % 6
     ],
@@ -38,15 +28,8 @@ export function seed(): CityData {
     ...emptyEntry,
     id: i + 1,
     kind: 'agent',
-    name: `Agente demonstrativo ${i + 1}`,
-    registration: `DEMO-A${i + 1}`,
-    role: 'Agente de trânsito',
-    agency: 'Trânsito',
+    ...catalog.agents[i],
     status: ['active', 'available', 'incident', 'off_duty'][i % 4],
-    neighborhood: ['Centro', 'Fragata', 'Palmital'][i % 3],
-    region: ['Central', 'Sul', 'Norte'][i % 3],
-    latitude: -22.205 + i * 0.005,
-    longitude: -49.935 + i * 0.003,
   }))
   const events: CityEvent[] = []
   equipment.forEach((item, i) => {
@@ -60,7 +43,7 @@ export function seed(): CityData {
           timestamp: new Date(now - days * 86400000).toISOString(),
           external_id: `demo-${i}-${days}`,
           origin: 'demonstração',
-          description: 'Evento fictício para validar análises.',
+          description: `Inspeção demonstrativa: falha registrada em ${item.model}.`,
           resource_name: item.serial,
         }),
       )

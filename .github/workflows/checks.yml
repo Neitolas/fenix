@@ -109,3 +109,51 @@ jobs:
       - run: python backend/manage.py seed_demo
       - run: python backend/manage.py seed_demo
       - run: python backend/manage.py test config operations
+
+  integrated-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DJANGO_SECRET_KEY: ci-only-full-stack-key-0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ
+      REPORT_SERVICE_TOKEN: ci-only-full-stack-report-token-0123456789-abcdefghijklmnop
+      MYSQL_PASSWORD: ci-only-mysql-password
+      MYSQL_ROOT_PASSWORD: ci-only-root-password
+      E2E_USERNAME: browser_tester
+      E2E_PASSWORD: ci-only-browser-password-0123456789
+      E2E_BASE_URL: https://localhost:8443
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Certificado para teste local
+        run: python scripts/create_local_tls.py
+      - name: Construir e iniciar conjunto completo
+        run: docker compose -f compose.full.yaml up --build --detach --wait --wait-timeout 240
+      - name: Preparar inventário e usuário temporário
+        run: |
+          docker compose -f compose.full.yaml exec -T api python manage.py seed_demo
+          docker compose -f compose.full.yaml exec -T -e E2E_USERNAME -e E2E_PASSWORD api python manage.py shell -c 'import os; from django.contrib.auth import get_user_model; get_user_model().objects.create_user(os.environ["E2E_USERNAME"], password=os.environ["E2E_PASSWORD"], is_staff=True)'
+      - run: npm ci
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium webkit
+        working-directory: frontend
+      - name: Navegadores reais desktop e mobile
+        run: npm run test:e2e
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-validation
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
+      - name: Diagnóstico dos serviços
+        if: failure()
+        run: docker compose -f compose.full.yaml logs --no-color
+      - name: Encerrar ambiente temporário
+        if: always()
+        run: docker compose -f compose.full.yaml down --volumes

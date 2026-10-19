@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 COPY requirements*.txt ./
 RUN pip install --no-cache-dir -r requirements-production.txt
 COPY . .
-RUN useradd --system --uid 10001 --create-home fenix && chown -R fenix:fenix /app
+RUN mkdir -p /app/staticfiles && useradd --system --uid 10001 --create-home fenix && chown -R fenix:fenix /app
 USER fenix
 ENV DJANGO_SETTINGS_MODULE=config.settings_production
 EXPOSE 8000

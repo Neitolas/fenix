@@ -122,7 +122,7 @@ describe('Fluxos da central', () => {
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Inventário' }))
     await user.click(
-      within(screen.getByText('DEMO-001').closest('tr')!).getByRole('button', {
+      within(screen.getByText('CAM-CENTRO-001').closest('tr')!).getByRole('button', {
         name: 'Ver detalhes',
       }),
     )
@@ -190,11 +190,11 @@ describe('Fluxos da central', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Inventário' }))
-    const row = screen.getByText('DEMO-001').closest('tr')!
+    const row = screen.getByText('CAM-CENTRO-001').closest('tr')!
     await user.click(within(row).getByRole('button', { name: 'Ver detalhes' }))
     await user.click(screen.getByRole('button', { name: 'Simular falha' }))
     expect(
-      within(screen.getByText('DEMO-001').closest('tr')!).getByText('Mau funcionamento'),
+      within(screen.getByText('CAM-CENTRO-001').closest('tr')!).getByText('Mau funcionamento'),
     ).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Operação' }))
     expect(screen.getByText('demonstração local')).toBeTruthy()
@@ -257,4 +257,29 @@ it('mantém dados válidos e funciona quando o armazenamento é bloqueado', () =
   })
   expect(readDemo().data.equipment).toHaveLength(12)
   expect(readDemo().warning).not.toBe('')
+})
+
+it('atualiza apenas rótulos antigos dos exemplos e preserva personalizações', () => {
+  const original = seed()
+  original.equipment[0] = {
+    ...original.equipment[0],
+    serial: 'DEMO-001',
+    brand: 'Demonstração',
+    model: 'Modelo 1',
+    street: 'Via demonstrativa',
+    reference: 'Local fictício',
+  }
+  original.equipment[1].model = 'Modelo personalizado'
+  original.agents[0] = {
+    ...original.agents[0],
+    name: 'Agente demonstrativo 1',
+    registration: 'DEMO-A1',
+  }
+  original.events[0] = { ...original.events[0], equipment: 1, resource_name: 'DEMO-001' }
+  localStorage.setItem('fenix-demo-v1', JSON.stringify(original))
+  const updated = readDemo().data
+  expect(updated.equipment[0].serial).toBe('CAM-CENTRO-001')
+  expect(updated.equipment[1].model).toBe('Modelo personalizado')
+  expect(updated.agents[0].name).toBe('Ana Martins')
+  expect(updated.events[0].resource_name).toBe('CAM-CENTRO-001')
 })
