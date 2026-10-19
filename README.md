@@ -111,10 +111,6 @@ Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django
 - Os testes de celular utilizam emulação. A conferência em aparelhos físicos permanece pendente.
 - A execução Docker está configurada para acesso local. Uma implantação pública exige servidor, domínio, certificado válido e política de backup.
 
-## Para desenvolver ou aprofundar
-
-O [guia técnico](docs/guia-tecnico.md) reúne a execução manual, as regras de pontuação, os comandos de teste e as orientações de produção.
-
 ## Participação de inteligência artificial
 
 O desenvolvimento contou com apoio do **ChatGPT/Codex** na interpretação dos requisitos, planejamento, configuração do ambiente, implementação e refatoração de código, ajustes de interface, testes e documentação. A arte de fundo foi adaptada com geração de imagens a partir de uma referência enviada pelo participante.
