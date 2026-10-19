@@ -2,163 +2,118 @@
 
 Uma cidade capaz de recomeçar.
 
-Projeto para a etapa bônus do DSIN Coder Challenge 2026. Dentro da iniciativa F.O.G.O., o F.E.N.I.X. reúne inventário, operação e prevenção para apoiar a recuperação da cidade no universo de PROMETHEUS.
+Projeto para a etapa bônus do DSIN Coder Challenge 2026, inspirado na iniciativa F.O.G.O. e no universo de PROMETHEUS. A proposta é reunir os recursos da cidade em uma única visão conhecer o que está disponível, acompanhar a operação e identificar situações que exigem atenção antecipada.
 
-## Identidade e decisões
+## O que o projeto faz
 
-F.E.N.I.X. representa **Força, Evolução do Nutrir, Integração e X (Incógnita/Potencial)**. O nome e o significado foram propostos pelo participante. A referência à fênix traduz o renascimento: conhecer os recursos, recuperar o funcionamento e aprender com as falhas. Nutrir, nesse contexto, significa alimentar decisões com informações confiáveis.
+| Módulo | O que permite fazer |
+| --- | --- |
+| Inventário | Cadastrar, consultar, editar e excluir logicamente equipamentos e agentes. Registrar localização, situação, características e manutenção. |
+| Operação | Localizar recursos no mapa, aplicar filtros, acompanhar indicadores e alertas e consultar o histórico de eventos. |
+| Prevenção | Consultar um índice de atenção, entender os fatores da pontuação e comparar falhas recentes com o período anterior. |
 
-A solução foi organizada a partir das três necessidades do enunciado. React/TypeScript cuida da interface; Django concentra dados e regras; PHP gera relatórios CSV sem receber acesso ao banco. Essa divisão permite demonstrar as tecnologias informadas no perfil do participante sem duplicar cadastros entre duas linguagens.
+A solução também oferece relatórios CSV na execução integrada, autenticação e interface adaptada a celulares. Os exemplos são fictícios e compartilhados entre os três módulos câmeras Sentinela 360, radares Via Segura 60, viaturas Patrulha Urbana e agentes como Ana Martins e Bruno Lima.
 
-SQLite facilita a primeira execução. MySQL está configurado como alternativa no Docker Compose. O índice de atenção usa regras abertas, e não uma suposta inteligência preditiva sem dados suficientes.
+## Como a solução foi pensada
 
-## O que está implementado
+F.E.N.I.X. representa Força, Evolução do Nutrir, Integração e X (IncógnitaPotencial). O nome remete ao renascimento reconstruir, recuperar o funcionamento e aprender com as falhas. “Nutrir” significa alimentar decisões com informações confiáveis.
 
-Inventário: cadastro, pesquisa, filtros, detalhes, edição e exclusão lógica de equipamentos e agentes. Equipamentos incluem endereço, GPS, número de série, marca, modelo, situação, manutenção e características JSON. Agentes incluem matrícula por órgão, função, localização e situação.
+React e TypeScript cuidam da interface. Django centraliza os cadastros, o histórico e as regras. PHP gera relatórios CSV sem acessar diretamente o banco. A execução completa utiliza MySQL; o desenvolvimento local também pode usar SQLite.
 
-Operação: mapa Leaflet/OpenStreetMap, indicadores, alertas de manutenção, visão por região e histórico. Na conexão com Django, os dados são atualizados a cada cinco segundos. Eventos manuais simulam atividade, falha e manutenção concluída. O servidor mantém histórico, rejeita eventos futuros inválidos e evita duplicação pelo identificador externo.
+A prevenção usa regras explicáveis de manutenção e histórico. O índice vai de 0 a 100 e não representa uma probabilidade estatística de falha. A tela apresenta os motivos da pontuação e recomendações para apoiar a decisão.
 
-O histórico preserva as coordenadas enviadas e o estado informado por cada evento. Atividade, posição e estado têm ordenação independente: uma falha atrasada pode atualizar o estado se não houver outra transição posterior, mas não substitui uma recuperação mais recente. Coordenadas antigas ficam no histórico sem mover o marcador atual. Eventos sem posição ou transição exibem esses campos vazios. A busca usa conversão Unicode para minúsculas também no servidor, mantendo o filtro do CSV consistente com a interface em SQLite e MySQL; em bases maiores, essa busca precisa de índice normalizado.
+## Conjunto completo com HTTPS
 
-Prevenção: índice de atenção de 0 a 100 com fatores e recomendações visíveis, além da comparação de falhas em duas janelas de sete dias. A pontuação não é uma probabilidade estatística de falha. Indisponibilidade atual e risco preventivo são apresentados separadamente.
+Este é o caminho recomendado para avaliar todos os recursos, incluindo banco de dados, autenticação e relatórios. Tenha Git, Python 3.12, Docker com Compose e OpenSSL disponíveis. No Windows, mantenha o Docker Desktop iniciado.
 
-Relatórios: endpoint Django autenticado chama PHP pela rede interna. PHP valida o contrato e gera CSV UTF-8 com proteção contra fórmulas de planilha. Falha do serviço é apresentada ao usuário; não há geração silenciosa em Python fingindo ser PHP.
-
-Sessão: autenticação Django e proteção CSRF para escritas. Administração disponível em `/admin/`. O projeto ainda não passou por uma revisão de implantação em produção.
-
-## Visualização no ChatGPT
-
-https://fenix-interface-neitolas.pink-loach-9049.chatgpt.site
-
-A visualização privada serve a interface compilada de React. **Ela abre em demonstração local**, com dados fictícios identificados e persistidos apenas no navegador. É possível cadastrar, editar, excluir, filtrar e registrar eventos demonstrativos. Para reiniciar os exemplos, remova a chave `fenix-demo-v1` do armazenamento local do navegador.
-
-Esse endereço não hospeda Django nem PHP. Na execução integrada, entre em `http://127.0.0.1:8000/admin/` com o usuário criado e recarregue a interface: ela reconhece a sessão autenticada pela mesma origem. O site privado não se conecta automaticamente ao localhost do computador. Exportar CSV requer a execução integrada e fica indisponível na demonstração. Os mapas externos dependem de rede; as listas continuam disponíveis se os mapas não carregarem.
-
-## Executar o projeto integrado
-
-Requisitos: Python 3.12, Node.js 24, npm e PHP 8.3 ou superior. Para MySQL, Docker com Compose v2. Não é preciso contratar um serviço pago para executar localmente.
+### 1. Baixe o projeto
 
 ```sh
-git clone https://github.com/Neitolas/fenix.git
+git clone --branch refactorqualidade-codigo httpsgithub.comNeitolasfenix.git
 cd fenix
-python -m venv .venv
 ```
 
-No Windows PowerShell:
+### 2. Prepare a configuração
+
+Copie o arquivo de exemplo para criar sua configuração local.
+
+No Windows PowerShell
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
-Copy-Item .env.example .env
+Copy-Item .env.full.example .env.full
 ```
 
-No Linux ou macOS:
+No Linux ou macOS
 
 ```sh
-source .venv/bin/activate
-cp .env.example .env
+cp .env.full.example .env.full
 ```
 
-No primeiro terminal, com o ambiente ativado:
+Abra `.env.full` em um editor. Preencha os quatro campos de segredo `DJANGO_SECRET_KEY`, `REPORT_SERVICE_TOKEN`, `MYSQL_PASSWORD` e `MYSQL_ROOT_PASSWORD`. Gere um valor diferente para cada campo executando este comando quatro vezes
 
 ```sh
-python -m pip install -r backend/requirements.txt
-python backend/manage.py migrate
-python backend/manage.py seed_demo
-python backend/manage.py createsuperuser
-python backend/manage.py runserver 127.0.0.1:8000
+python -c import secrets; print(secrets.token_urlsafe(64))
 ```
 
-Escolha seu próprio usuário e senha. O comando `seed_demo` cria 12 equipamentos, seis agentes e eventos fictícios em torno de Marília; pode ser repetido sem duplicar os exemplos nem sobrescrever edições existentes. Ele não cria uma senha padrão.
+Mantenha os hosts locais informados no exemplo. Não compartilhe esse arquivo nem suas senhas.
 
-No segundo terminal:
+### 3. Inicie a aplicação
+
+Execute na pasta principal do projeto
 
 ```sh
-cd frontend
-npm ci
-npm run dev
+python scriptscreate_local_tls.py
+docker compose --env-file .env.full -f compose.full.yaml up --build --detach --wait
+docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py seed_demo
+docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py createsuperuser
 ```
 
-Entre em http://127.0.0.1:8000/admin/ com o usuário criado. Em seguida, abra ou recarregue http://127.0.0.1:5173; a interface reconhece a sessão e carrega os dados do servidor. Use o mesmo host `127.0.0.1` nos dois endereços para compartilhar o cookie. O proxy do Vite encaminha `/api` ao Django e preserva a mesma origem para cookies e CSRF.
+A primeira inicialização pode demorar enquanto o Docker baixa e constrói os serviços. A carga de exemplos cria 12 equipamentos, seis agentes e eventos fictícios. Pode ser repetida sem duplicar registros nem substituir personalizações. Escolha seu próprio usuário e senha no último comando.
 
-No terceiro terminal, com o ambiente Python ativado e PHP disponível no PATH:
+### 4. Abra e entre no sistema
+
+Abra [a administração local](httpslocalhost8443admin) e entre com o usuário criado. Depois, acesse [a aplicação](httpslocalhost8443) ou recarregue a página para que ela reconheça a sessão.
+
+O certificado é autoassinado e exclusivo para teste local; o navegador exibirá um aviso. Use `localhost` nos dois endereços para manter a mesma sessão.
+
+### 5. Encerre quando terminar
 
 ```sh
-python scripts/run_reports.py
+docker compose --env-file .env.full -f compose.full.yaml down
 ```
 
-O script carrega `.env` e inicia PHP em `127.0.0.1:9080`. O mesmo `REPORT_SERVICE_TOKEN` deve ser usado pelos dois serviços. Os valores de `.env.example` servem apenas ao desenvolvimento local. Não publique `.env`, senhas, `.venv`, bancos locais ou `node_modules`.
+Os dados permanecem no banco para a próxima execução. Não acrescente `-v` se quiser preservá-los.
 
-## Alternativa com MySQL e PHP no Docker
+## Roteiro rápido de avaliação
 
-Com `.env` configurado e a API local desligada para liberar a porta 8000:
+1. No Inventário, consulte os exemplos, filtre por bairro e cadastre um equipamento. Edite sua situação e confira os dados nos detalhes.
 
-```sh
-docker compose --profile mysql up --build
-```
+2. Na Operação, localize o recurso no mapa e registre uma falha. Observe a mudança de situação, o alerta e o histórico. Na conexão com o servidor, os dados são atualizados a cada cinco segundos.
 
-O Compose inicia MySQL, Django e PHP. A API aguarda o banco e aplica as migrações; o serviço PHP não expõe porta na máquina hospedeira. Em outro terminal:
+3. Na Prevenção, consulte a pontuação, os fatores e as recomendações. Registre uma manutenção concluída e acompanhe a mudança.
 
-```sh
-docker compose --profile mysql exec api python manage.py seed_demo
-docker compose --profile mysql exec api python manage.py createsuperuser
-```
+4. Exporte um CSV para conferir o relatório dos recursos filtrados. Essa função exige a execução integrada e uma sessão autenticada.
 
-Execute o frontend com npm como na seção anterior. `docker compose --profile mysql down` encerra os serviços preservando o volume do banco. Não use `down -v` se quiser preservar esses dados.
+## Qualidade e validação
 
-## Regras do índice e dos indicadores
+O código separa interface, validação e regras por responsabilidade, reutiliza componentes e evita duplicação desnecessária. As operações de cadastro incluem validação, autenticação e proteção CSRF. A exclusão é lógica, preservando o histórico, e o recebimento de eventos evita duplicações.
 
-Manutenção imediata soma 40 pontos. Manutenção programada vencida soma 25; prevista nos próximos sete dias, 10. Cada falha nos últimos sete dias soma 10, limitada a 30. Ausência de sinal por mais de 30 minutos soma 15 somente quando já existe histórico de telemetria. Vencida e próxima não se acumulam. O total é limitado a 100.
+Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django com integração HTTP habilitada, oito verificações PHP e oito cenários de navegador. O conjunto completo com HTTPS foi validado em Chromium e WebKit, com tamanhos de tela de desktop e celular, incluindo 320 px. Os [resultados da validação](httpsgithub.comNeitolasfenixactionsruns39189329717) estão disponíveis no GitHub Actions.
 
-Atenção baixa: 0–24; moderada: 25–49; alta: 50–74; crítica: 75–100. Uma falha manual muda o equipamento para mau funcionamento e manutenção imediata. A manutenção concluída encerra a pendência e devolve o equipamento à situação operacional.
+## Limitações conhecidas
 
-Disponibilidade = operacionais ÷ (operacionais + indisponíveis). Não instalados ficam fora do denominador. Sem equipamentos elegíveis, a tela mostra “Sem dados”. Os fatores preventivos não são usados para inventar previsões de criminalidade ou de tráfego sem dados dessas ocorrências.
+- O mapa depende de um provedor externo. Se o fundo não carregar, a aplicação informa a falha e mantém os pontos e as listas disponíveis.
 
-## Estrutura
+- A análise preventiva usa exemplos fictícios e regras explícitas; não é um modelo de aprendizado de máquina nem uma previsão de criminalidade ou tráfego.
 
-- `backend/operations/`: modelos, formulários, API, eventos, serviços de análise, administração e testes.
-- `backend/config/`: configuração e rotas do Django.
-- `frontend/src/`: interface React, cliente da API, regras da demonstração e testes.
-- `frontend/src/components/`: mapa, formulários e diálogos acessíveis.
-- `reports-php/`: contrato CSV, serviço HTTP, Dockerfile e testes PHP.
-- `scripts/run_reports.py`: inicialização local do serviço PHP.
-- `docs/superpowers/`: especificação, plano e registro do desenvolvimento.
-- `.github/workflows/checks.yml`: verificações de backend, frontend e relatórios.
+- O histórico apresenta os 200 eventos mais recentes. O inventário é carregado na memória do navegador; bases maiores exigem evolução dos filtros e indicadores no servidor.
 
-## Testar
+- Os testes de celular utilizam emulação. A conferência em aparelhos físicos permanece pendente.
 
-```sh
-python backend/manage.py check
-python backend/manage.py makemigrations --check --dry-run
-python backend/manage.py test config operations
-php reports-php/tests.php
-```
-
-No diretório `frontend/`:
-
-```sh
-npm test
-npm run lint
-npm run build
-```
-
-As verificações incluem regras da demonstração, navegação, cadastro persistido no navegador, evento simulado, validações e autenticação da API, histórico, indicadores, pontuação, custo das consultas e geração segura de CSV.
-
-Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusive no teste HTTP de integração Django→PHP→CSV. O mesmo código está preparado para PHP CLI nativo. Docker/MySQL ainda não foram executados aqui. Os testes de interface usam DOM simulado; não substituem a conferência visual em diferentes navegadores nem validam a disponibilidade dos mapas externos.
-
-## Próximas validações
-
-Validar o caminho Docker/MySQL em instalação limpa, conferir o mapa e os formulários em navegadores reais, revisar segurança de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. A visualização estática não equivale à hospedagem dos três serviços integrados.
-
-O prazo do enunciado é 27/10/2026 às 23h59. O repositório está privado durante o desenvolvimento; o material deverá ficar acessível aos avaliadores antes da submissão. O limite de envio informado é 50 MB.
+- A execução Docker está configurada para acesso local. Uma implantação pública exige servidor, domínio, certificado válido e política de backup.
 
 ## Participação de inteligência artificial
 
-ChatGPT/Codex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente e implementação de código, estilos, testes e documentação. O nome F.E.N.I.X. e seu significado foram propostos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
+ChatGPTCodex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente.
 
-## Aparência da página inicial
-
-O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 901 px de largura, sem alterar a configuração de zoom do navegador. Em telas menores, mantém a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração permanece no cabeçalho.
-
-A arte foi adaptada com a ferramenta integrada de geração de imagens, usando a imagem de fênix enviada pelo participante. Prompt utilizado:
-
-> Use case: stylized-concept. Asset type: widescreen website homepage wallpaper for F.E.N.I.X., a dark urban mobility dashboard. Adapt the attached phoenix artwork into a refined wide landscape 16:9 painterly wallpaper. Preserve the reference's majestic phoenix with outstretched wings, painterly oil-like texture, amber and gold fire, orange crimson clouds and radiant halo. Place the entire bird and its readable outstretched wings in the RIGHT half, centered around 72% width and 43% height, with a long glowing tail downward. Left 50% should be quiet almost black charcoal-green atmospheric smoke (#141716), subtle warm embers near the bottom, and very low visual detail to allow overlay text. Seamless natural transition from dark left to luminous gold upper-right, dark crimson lower-right. Dramatic but restrained, elegant painterly concept art, not a poster. Keep most edges and lower region dark to blend with #141716 UI. No text, no typography, no logo, no borders, no UI. Output a high resolution wide landscape image.
+O nome F.E.N.I.X., implementação de código, estilos, testes, documentação e seu significado foram propostosfeitos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
