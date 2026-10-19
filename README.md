@@ -156,9 +156,9 @@ Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusi
 
 ## Próximas validações
 
-Validar o caminho Docker/MySQL em instalação limpa, conferir o mapa e os formulários em navegadores reais, revisar segurança de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. A visualização estática não equivale à hospedagem dos três serviços integrados.
+Validar as imagens da aplicação e o conjunto completo do Docker Compose, conferir o mapa e os formulários em navegadores reais, validar a infraestrutura de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. MySQL 8.4 em contêiner limpo já passou no CI com migrações, carga de exemplos repetida e testes. A visualização estática não equivale à hospedagem dos três serviços integrados.
 
-O prazo do enunciado é 27/10/2026 às 23h59. O repositório está privado durante o desenvolvimento; o material deverá ficar acessível aos avaliadores antes da submissão. O limite de envio informado é 50 MB.
+O prazo do enunciado é 27/10/2026 às 23h59. O material deverá permanecer acessível aos avaliadores na submissão. O limite de envio informado é 50 MB.
 
 ## Organização e qualidade do código
 
@@ -220,7 +220,7 @@ O mapa preserva o enquadramento quando chegam atualizações dos mesmos recursos
 
 Tabelas de equipamentos e agentes mostram até 50 registros por página, com contagem e controles acessíveis. Alterar o conjunto filtrado retorna à primeira página. Os indicadores continuam considerando todos os resultados filtrados. A paginação é de apresentação: a central ainda carrega até 5.000 registros de cada categoria pela API, e o histórico permanece limitado aos 200 eventos mais recentes. Uma base maior exige consultas e filtros no servidor, sem carregar todo o inventário a cada ciclo.
 
-Validação desta revisão: 28 testes Django com os relatórios por HTTP habilitados, 25 testes do frontend (oito de domínio e 17 de interface/componentes) e oito verificações PHP. Foram verificados CSV filtrado, rejeições 400/401 do PHP, saúde 200 do Gunicorn, redirecionamento HTTPS 301, HSTS e cookie CSRF com `Secure`. A execução PHP local usa PHP.wasm. O CI inclui integração HTTP com PHP 8.3 nativo e um job MySQL 8.4 com migrações, carga demonstrativa repetida e testes. A configuração desses jobs não significa que a execução já tenha sido aprovada; acompanhe os resultados no GitHub Actions. Docker/MySQL não estão disponíveis neste ambiente, e não houve validação visual em navegador real.
+Validação desta revisão: 28 testes Django com os relatórios por HTTP habilitados, 25 testes do frontend (oito de domínio e 17 de interface/componentes) e oito verificações PHP. Foram verificados CSV filtrado, rejeições 400/401 do PHP, saúde 200 do Gunicorn, redirecionamento HTTPS 301, HSTS e cookie CSRF com `Secure`. A execução PHP local usa PHP.wasm. O CI inclui integração HTTP com PHP 8.3 nativo e um job MySQL 8.4 com migrações, carga demonstrativa repetida e testes. Os quatro jobs (backend, frontend, reports e mysql) foram aprovados na [execução 24 do GitHub Actions](https://github.com/Neitolas/fenix/actions/runs/39187680840), referente ao commit `68e0e2bae887c53708c037bfd930452be610c03a`. Docker/MySQL não estão disponíveis localmente neste ambiente; a validação do MySQL ocorreu no contêiner do CI. As imagens completas da aplicação e a conferência visual em navegador real ainda não foram verificadas.
 
 Com o PHP iniciado, para executar os testes HTTP no Linux/macOS:
 
