@@ -152,11 +152,11 @@ npm run build
 
 As verificações incluem regras da demonstração, navegação, cadastro persistido no navegador, evento simulado, validações e autenticação da API, histórico, indicadores, pontuação, custo das consultas e geração segura de CSV.
 
-Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusive no teste HTTP de integração Django→PHP→CSV. O mesmo código está preparado para PHP CLI nativo. Docker/MySQL ainda não foram executados aqui. Os testes de interface usam DOM simulado; não substituem a conferência visual em diferentes navegadores nem validam a disponibilidade dos mapas externos.
+Neste ambiente, PHP foi executado por PHP.wasm, do WordPress Playground, inclusive na integração HTTP Django→PHP→CSV. O CI também executa PHP 8.3 nativo e o conjunto Docker com MySQL. Testes de componentes usam DOM simulado; os testes E2E descritos ao final usam Chromium e WebKit reais. Nenhum deles garante disponibilidade dos mapas externos.
 
 ## Próximas validações
 
-Validar as imagens da aplicação e o conjunto completo do Docker Compose, conferir o mapa e os formulários em navegadores reais, validar a infraestrutura de produção, registrar um vídeo demonstrativo e revisar a documentação com o participante. MySQL 8.4 em contêiner limpo já passou no CI com migrações, carga de exemplos repetida e testes. A visualização estática não equivale à hospedagem dos três serviços integrados.
+Conferir a experiência em aparelhos físicos, validar a infraestrutura pública de destino e a disponibilidade dos mapas externos, registrar um vídeo demonstrativo e revisar a documentação com o participante. As imagens Docker e o conjunto integrado com HTTPS já passaram no CI em Chromium e WebKit. A visualização estática não equivale à hospedagem permanente dos serviços integrados.
 
 O prazo do enunciado é 27/10/2026 às 23h59. O material deverá permanecer acessível aos avaliadores na submissão. O limite de envio informado é 50 MB.
 
@@ -185,7 +185,7 @@ Arquivos extraídos nesta etapa:
 - `backend/operations/event_service.py`: transação, deduplicação e atualização independente de estado, posição e manutenção.
 - `pyproject.toml`, `.editorconfig` e `backend/requirements-dev.txt`: convenções e ferramentas de desenvolvimento.
 
-Validação desta etapa: 21 testes Django, 7 testes de domínio e 8 de interface passaram. Ruff, Prettier, Oxlint e build TypeScript/Vite também passaram. As oito verificações PHP e o teste HTTP Django → PHP → CSV foram executados com PHP.wasm; respostas 400 de contrato inválido e 401 de autenticação também foram verificadas. A execução nativa com PHP 8.3 permanece no CI. Docker/MySQL e conferência visual em navegador real continuam entre as validações pendentes.
+A validação atual está consolidada na seção **Resultado da validação integrada**, ao final deste documento.
 
 Referências oficiais: [princípios arquitetônicos e SOLID](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles), [hooks personalizados do React](https://react.dev/learn/reusing-logic-with-custom-hooks), [Ruff](https://docs.astral.sh/ruff/formatter/) e [PSR-12](https://www.php-fig.org/psr/psr-12/).
 
@@ -195,7 +195,7 @@ ChatGPT/Codex auxiliou na interpretação dos requisitos, planejamento, configur
 
 ## Aparência da página inicial
 
-O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 1101 px de largura em dispositivos com ponteiro preciso e suporte a hover, sem alterar o zoom do navegador. Celulares e tablets com toque mantêm a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração permanece no cabeçalho.
+O wallpaper fica em `frontend/src/assets/fenix-wallpaper.webp` e aparece apenas no Início. A interface usa escala CSS de 75% a partir de 1101 px de largura em dispositivos com ponteiro preciso e suporte a hover, sem alterar o zoom do navegador. Celulares e tablets com toque mantêm a escala normal para preservar a leitura. A faixa de demonstração e o botão de conexão foram retirados; o indicador discreto de demonstração fica no canto inferior esquerdo.
 
 A arte foi adaptada com a ferramenta integrada de geração de imagens, usando a imagem de fênix enviada pelo participante. Prompt utilizado:
 
@@ -216,11 +216,11 @@ A leitura da demonstração valida o conteúdo de cada recurso e evento, incluin
 
 A demonstração valida os tipos das características, visão noturna booleana, limite de velocidade entre 1 e 200, opções de situação/manutenção, datas e limites de texto. O Django também rejeita listas vazias no campo de características, que deve conter um objeto JSON.
 
-O mapa preserva o enquadramento quando chegam atualizações dos mesmos recursos. Ele se ajusta quando o conjunto de recursos muda; o botão **Enquadrar recursos** permite ajustar a visualização manualmente. O comportamento foi testado com a API Leaflet substituída no teste de componente; a disponibilidade dos mapas e o gesto de zoom em navegador real ainda precisam de conferência.
+O mapa preserva o enquadramento quando chegam atualizações dos mesmos recursos. Ele se ajusta quando o conjunto de recursos muda; o botão **Enquadrar recursos** permite ajustar a visualização manualmente. O comportamento foi testado com a API Leaflet substituída no teste de componente e com o componente real nos testes E2E. A disponibilidade do provedor externo e os gestos em aparelhos físicos ainda exigem conferência.
 
-Tabelas de equipamentos e agentes mostram até 50 registros por página, com contagem e controles acessíveis. Alterar o conjunto filtrado retorna à primeira página. Os indicadores continuam considerando todos os resultados filtrados. A paginação é de apresentação: a central ainda carrega até 5.000 registros de cada categoria pela API, e o histórico permanece limitado aos 200 eventos mais recentes. Uma base maior exige consultas e filtros no servidor, sem carregar todo o inventário a cada ciclo.
+Tabelas de equipamentos e agentes mostram até 50 registros por página, com contagem e controles acessíveis. Alterar o conjunto filtrado retorna à primeira página. Os indicadores continuam considerando todos os resultados filtrados. A paginação das tabelas é de apresentação. A leitura da API percorre páginas de 200 registros até alcançar o total informado, sem o antigo limite fixo de 5.000; um teste verifica 5.201 registros. Uma página vazia antes do total gera erro explícito em vez de um ciclo sem progresso. O histórico continua limitado aos 200 eventos mais recentes. O inventário ainda é mantido na memória do navegador: bases grandes exigem filtros e indicadores totalmente no servidor para reduzir transferência e processamento.
 
-Validação desta revisão: 28 testes Django com os relatórios por HTTP habilitados, 25 testes do frontend (oito de domínio e 17 de interface/componentes) e oito verificações PHP. Foram verificados CSV filtrado, rejeições 400/401 do PHP, saúde 200 do Gunicorn, redirecionamento HTTPS 301, HSTS e cookie CSRF com `Secure`. A execução PHP local usa PHP.wasm. O CI inclui integração HTTP com PHP 8.3 nativo e um job MySQL 8.4 com migrações, carga demonstrativa repetida e testes. Os quatro jobs (backend, frontend, reports e mysql) foram aprovados na [execução 24 do GitHub Actions](https://github.com/Neitolas/fenix/actions/runs/39187680840), referente ao commit `68e0e2bae887c53708c037bfd930452be610c03a`. Docker/MySQL não estão disponíveis localmente neste ambiente; a validação do MySQL ocorreu no contêiner do CI. As imagens completas da aplicação e a conferência visual em navegador real ainda não foram verificadas.
+A revisão foi ampliada com carga de exemplos coerentes, testes de migração e execução integrada em navegadores. Os resultados atuais estão consolidados ao final deste documento.
 
 Com o PHP iniciado, para executar os testes HTTP no Linux/macOS:
 
@@ -254,3 +254,64 @@ Configure o proxy para servir `backend/staticfiles` em `/static/`. `DJANGO_TRUST
 HSTS começa com 3.600 segundos. Inclusão de subdomínios e preload são decisões explícitas: ficam desativados no exemplo e geram os avisos W005/W021 de implantação. Só ative ambos após garantir HTTPS em todos os subdomínios; preload também exige `DJANGO_HSTS_SECONDS` de pelo menos 31536000. Os testes verificam o perfil completo com essas opções habilitadas, além da rejeição de credenciais inadequadas. Nenhum aviso de segurança foi silenciado no projeto.
 
 Essa preparação não implanta Django/PHP no site estático do ChatGPT. O serviço PHP do Compose usa o servidor CLI para desenvolvimento; uma implantação pública completa ainda requer hospedagem adequada do PHP, TLS, backup e validação da infraestrutura real. Referência: [checklist oficial do Django 5.2](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/).
+
+
+## Exemplos urbanos compartilhados
+
+`backend/operations/demo_catalog.json` é o catálogo único consumido por Django e React. Os três módulos usam os mesmos recursos: por exemplo, `CAM-CENTRO-001` / **Sentinela 360 — Praça Central**, radar **Via Segura 60**, viatura **Patrulha Urbana** e terminal **Ponto Cidadão**. Os agentes possuem nomes fictícios, como Ana Martins e Bruno Lima; endereços, posições e ocorrências continuam sendo exemplos ilustrativos, sem representar uma operação real da cidade.
+
+Os rótulos antigos são atualizados somente quando ainda correspondem aos padrões anteriores. No navegador, a atualização ocorre em memória e só é salva junto à próxima alteração. No Django, `seed_demo` reaproveita os registros antigos, preserva seus identificadores e histórico e não substitui personalizações. Repetir o comando não duplica os exemplos.
+
+## Conjunto completo com HTTPS
+
+`compose.full.yaml` integra o frontend compilado no Nginx, Django/Gunicorn, PHP-FPM 8.3 e MySQL 8.4. Apenas as portas 8080 e 8443 do Nginx são publicadas, limitadas a `127.0.0.1`. A API, o banco e os relatórios permanecem na rede interna. A configuração do Nginx encaminha API/admin na mesma origem, serve os arquivos estáticos e repassa as solicitações de relatórios ao PHP-FPM. O proxy define o protocolo HTTPS explicitamente, sem aceitar esse cabeçalho do cliente.
+
+Para testar localmente, instale Docker com Compose e OpenSSL. Copie `.env.full.example` para `.env.full` e preencha cada segredo com um valor aleatório diferente. Não use os valores do CI nem as credenciais de desenvolvimento.
+
+```sh
+python scripts/create_local_tls.py
+docker compose --env-file .env.full -f compose.full.yaml up --build --detach --wait
+docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py seed_demo
+docker compose --env-file .env.full -f compose.full.yaml exec api python manage.py createsuperuser
+```
+
+Abra `https://localhost:8443`. O certificado gerado é autoassinado, exclusivo para teste local; o navegador exibirá um aviso. Entre em `/admin/` e volte à página inicial para reconhecer a sessão. O script preserva certificados existentes. Para hospedar publicamente, configure um domínio, certificado válido, servidor de destino, portas e política de backup; a publicação estática do ChatGPT continua separada desse conjunto.
+
+```sh
+docker compose --env-file .env.full -f compose.full.yaml down
+```
+
+Esse comando preserva os volumes do banco. A remoção de volumes usada no CI se aplica apenas ao banco temporário dos testes.
+
+## Testes em navegadores reais
+
+`frontend/e2e/central.spec.ts` verifica navegação, ausência de rolagem horizontal na página, cadastro persistido, sessão autenticada, cadastro/exclusão no servidor, evento de falha e download CSV pelo PHP-FPM. A configuração cobre Chromium de desktop, Chromium com emulação de celular, WebKit com emulação de iPhone e uma tela de 320 px. Emulação não substitui teste em um aparelho físico.
+
+O job `integrated-browser` constrói as imagens do conjunto completo, aguarda os serviços, cria um usuário temporário e instala os navegadores somente no runner do GitHub. Capturas da área visível de cada aba, do mapa e do histórico, rastros de falhas e relatório HTML são publicados no artefato `browser-validation`. As capturas usam escala CSS e são divididas por área para respeitar o limite de tamanho de imagem do WebKit em páginas longas. O comando, com o conjunto já em execução e um usuário temporário configurado por `E2E_USERNAME`/`E2E_PASSWORD`, é:
+
+```sh
+cd frontend
+npm ci
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
+```
+
+Os testes usam um perfil de navegador isolado e aceitam apenas para essa execução o certificado local autoassinado. Não alteram a configuração de certificados do navegador pessoal.
+
+
+### Ajustes encontrados pela revisão visual
+
+Os seletores usam aparência própria e esquema escuro para evitar fundos claros com texto de baixo contraste no WebKit. O indicador da aba ativa não herda a borda do estado de hover de outro botão.
+
+Quando o fundo do mapa falha, a camada é removida e um aviso explica que pontos e listas continuam disponíveis. O provedor padrão usa a URL oficial `https://tile.openstreetmap.org/{z}/{x}/{y}.png`. O Nginx mantém `strict-origin-when-cross-origin` para não suprimir a referência de origem em solicitações legítimas de mapas. Disponibilidade do serviço externo não é garantida.
+
+Os testes de navegador interceptam e abortam as solicitações ao provedor externo para testar explicitamente a alternativa sem mapa base, sem gerar tráfego automatizado nos servidores comunitários. Isso valida o componente Leaflet, seus pontos e os fluxos da aplicação, mas não certifica o serviço de mapas externo. Referência: [política oficial de mapas do OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
+
+
+## Resultado da validação integrada
+
+A [execução do GitHub Actions de 19/10/2026](https://github.com/Neitolas/fenix/actions/runs/39189329717), referente ao commit `3f42bd5097e4348a3a6b063b9b74ed0a6f124f7b`, aprovou os cinco jobs: backend, frontend, reports, mysql e integrated-browser. Foram aprovados 30 testes do frontend, 30 testes Django com integração HTTP habilitada, oito verificações PHP e oito cenários E2E. Ruff, Prettier, Oxlint e a compilação também passaram.
+
+O conjunto Nginx/React, Django/Gunicorn, PHP-FPM e MySQL foi construído e iniciado no CI com HTTPS local. A revisão das capturas confirmou os seletores escuros no WebKit, o layout compacto de 320 px e o aviso de mapa indisponível com os marcadores preservados. O artefato `browser-validation` contém capturas e relatório HTML e permanece disponível pelo prazo de retenção do CI.
+
+A prontidão do MySQL exige uma consulta SQL autenticada por TCP; isso evita iniciar a API enquanto apenas o servidor temporário de inicialização estiver disponível. A visualização publicada recebe o frontend atualizado. A hospedagem pública permanente do backend ainda depende de servidor, domínio, certificado válido e configuração de backup.
