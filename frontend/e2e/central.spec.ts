@@ -29,7 +29,7 @@ test('demonstração: navegação, cadastro, persistência e layout', async ({ p
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /Uma cidade capaz/ })).toBeVisible()
   await assertLayout(page)
-  await page.screenshot({ path: testInfo.outputPath('inicio.png'), fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('inicio.png'), fullPage: false, scale: 'css' })
   for (const [tab, title] of [
     ['Inventário', 'Inventário da cidade'],
     ['Operação', 'Central de operações'],
@@ -38,7 +38,21 @@ test('demonstração: navegação, cadastro, persistência e layout', async ({ p
     await page.getByRole('button', { name: tab, exact: true }).click()
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
     await assertLayout(page)
-    await page.screenshot({ path: testInfo.outputPath(`${tab}.png`), fullPage: true })
+    await page.screenshot({
+      path: testInfo.outputPath(`${tab}.png`),
+      fullPage: false,
+      scale: 'css',
+    })
+    if (tab === 'Operação') {
+      await page
+        .locator('.map-panel')
+        .screenshot({ path: testInfo.outputPath('mapa.png'), scale: 'css' })
+      await page
+        .getByRole('heading', { name: 'Histórico de eventos', exact: true })
+        .scrollIntoViewIfNeeded()
+      await page.screenshot({ path: testInfo.outputPath('historico.png'), scale: 'css' })
+      await page.evaluate(() => window.scrollTo(0, 0))
+    }
   }
   const serial = 'CAM-NAVEGADOR-001'
   await createEquipment(page, serial)
