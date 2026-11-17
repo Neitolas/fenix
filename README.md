@@ -117,3 +117,19 @@ Na validação integrada foram aprovados 30 testes do frontend, 30 testes Django
 ChatGPTCodex auxiliou na interpretação dos requisitos, planejamento, configuração do ambiente.
 
 O nome F.E.N.I.X., implementação de código, estilos, testes, documentação e seu significado foram propostosfeitos pelo participante. A declaração descreve contribuições efetivamente realizadas e deve acompanhar a evolução do projeto. A aplicação não utiliza uma API de IA em tempo de execução.
+
+## Roteiro de avaliação do portfólio
+
+O problema tratado é reunir cadastro, localização e estado de recursos urbanos em uma visão compartilhada. A solução conecta o inventário ao mapa e ao histórico e produz alertas por regras explicáveis. O índice preventivo apresenta os fatores usados em sua pontuação.
+
+| Etapa | Onde conferir |
+| --- | --- |
+| Visão geral e contribuição | [Caso no portfólio](https://portifolio-nathannc.pages.dev/projects/#project-fenix) |
+| Interface e regras do fluxo | [Frontend](frontend/src) |
+| Comportamento da API e consistência | [Testes do backend](backend/operations/tests.py) |
+| Comportamento da interface | [Testes da interface](frontend/src/App.ui.test.tsx) |
+| Verificação automatizada | [Workflow](.github/workflows/checks.yml) e [execuções no GitHub Actions](https://github.com/Neitolas/fenix/actions) |
+
+Para uma avaliação funcional, siga o roteiro de execução integrada deste README e confira o mesmo recurso no inventário, no mapa e nos relatórios. Os dados de exemplo permitem repetir o fluxo localmente.
+
+Esta seção de documentação foi revisada com assistência do Codex.
